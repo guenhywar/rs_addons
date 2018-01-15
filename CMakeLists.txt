@@ -10,6 +10,7 @@ endif(simtrack_nodes_FOUND)
 
 find_package(Caffe QUIET)
 find_package(aruco QUIET)
+find_package(MPI QUIET)
 
 if(Caffe_FOUND)
   message(STATUS "OPTIONAL MODULE Caffe FOUND")
@@ -90,7 +91,7 @@ endif(aruco_FOUND)
 
 if(Caffe_FOUND) 
   add_executable(extractfeats src/utils/ExtractFeatsFromCNNLayer)
-  target_link_libraries(extractfeats ${PCL_LIBRARIES} ${catkin_LIBRARIES} ${Caffe_LIBRARIES})
+  target_link_libraries(extractfeats ${PCL_LIBRARIES} ${catkin_LIBRARIES} ${Caffe_LIBRARIES} ${MPI_LIBRARIES})
   
   rs_add_library(rs_caffeClassification src/CaffeClassificationAnnotator.cpp)
   target_link_libraries(rs_caffeClassification ${catkin_LIBRARIES})
