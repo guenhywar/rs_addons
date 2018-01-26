@@ -1,6 +1,6 @@
 // Developed by: Rakib
 
-#include<iostream>
+#include <iostream>
 #include <vector>
 #include <fstream>
 #include <string>
@@ -8,15 +8,24 @@
 #include <rs_addons/RSClassifier.h>
 #include <map>
 #include <yaml-cpp/yaml.h>
-#include<ros/package.h>
-#include<boost/filesystem.hpp>
+#include <ros/package.h>
+#include <boost/filesystem.hpp>
+
+#if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/ml/ml.hpp>
+#elif CV_MAJOR_VERSION == 3
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/ml.hpp>
+#endif
+
 #include <rs/types/all_types.h>
 #include <rs/scene_cas.h>
-#include<rs/utils/time.h>
+#include <rs/utils/time.h>
 
 using namespace cv;
 
@@ -103,7 +112,7 @@ void RSClassifier::evaluation(std::vector<int> test_label, std::vector<int> pred
 
   //Declare the confusion matrix which takes test data label (test_label) and predicted_label or class as inputs.
   //It's size is defined by the number of classes.
-  std::vector <vector<int> >confusion_matrix(object_label.size(), vector<int>(object_label.size(), 0));
+  std::vector <std::vector<int> >confusion_matrix(object_label.size(), std::vector<int>(object_label.size(), 0));
 
   for(int i = 0; i < test_label.size(); i++)
   {

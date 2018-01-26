@@ -1,18 +1,27 @@
 // Developed by: Rakib
 
-#include<iostream>
+#include <iostream>
 #include <vector>
 #include <fstream>
 #include <string>
 #include "opencv2/opencv.hpp"
 #include <map>
 #include <yaml-cpp/yaml.h>
-#include<ros/package.h>
-#include<boost/filesystem.hpp>
+#include <ros/package.h>
+#include <boost/filesystem.hpp>
+
+#if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/ml/ml.hpp>
+#elif CV_MAJOR_VERSION == 3
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/ml.hpp>
+#endif
+
 #include <rs_addons/RSClassifier.h>
 #include <rs_addons/RSRF.h>
 using namespace cv;
@@ -35,6 +44,7 @@ void RSRF:: trainModel(std::string train_matrix_name, std::string train_label_na
 
   if(!pathToSaveModel.empty())
   {
+#if CV_MAJOR_VERSION == 2
     //set parameters for random forest algorithm ............................
     cv::Mat var_type = cv::Mat(train_matrix.cols + 1, 1, CV_8U);
     var_type.setTo(Scalar(CV_VAR_NUMERICAL));
@@ -59,6 +69,39 @@ void RSRF:: trainModel(std::string train_matrix_name, std::string train_label_na
     //train the random forest.....................................
     rtree->train(train_matrix, CV_ROW_SAMPLE, train_label, cv::Mat(), cv::Mat(), var_type, cv::Mat(), params);
 
+#elif CV_MAJOR_VERSION == 3
+
+    cv::Mat var_type = cv::Mat(train_matrix.cols +1, 1, CV_8U);
+    var_type.setTo(Scalar(cv::ml::VAR_NUMERICAL));
+    var_type.at<uchar>(train_matrix.cols, 0) = cv::ml::VAR_CATEGORICAL;
+
+    cv::Ptr<cv::ml::TrainData> trainData = cv::ml::TrainData::create(train_matrix,  //samples
+                                                                 cv::ml::ROW_SAMPLE, //layout
+                                                                 train_label, //responses
+                                                                 cv::noArray(), //varIdx
+                                                                 cv::noArray(), //sampleIdx
+                                                                 cv::noArray(), //sampleWeights
+                                                                 var_type //varType
+                                                                 );
+
+    cv::Ptr<cv::ml::RTrees> rtree = cv::ml::RTrees::create();
+
+    rtree->setMaxDepth(25);
+    rtree->setMinSampleCount(10);
+    rtree->setRegressionAccuracy(0);
+    rtree->setUseSurrogates(false);
+    rtree->setMaxCategories(15);
+    rtree->setPriors(cv::Mat());
+    rtree->setCalculateVarImportance(false);
+    //TODO: number of variables randomly selected at node and used to find the best split(s) is missing
+    //rtree->setCVFolds(4);
+    rtree->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 100, 0.01f)); //termination criteria, max # of trees, forest accuracy
+
+    rtree->train(trainData);
+    //rtree->train(train_matrix, cv::ml::ROW_SAMPLE, train_label);
+
+#endif
+
     //To save the trained data.............................
     rtree->save((pathToSaveModel).c_str());
   }
@@ -70,7 +113,7 @@ int RSRF::predict_multi_class(cv::Mat sample, cv::AutoBuffer<int>& out_votes)
 int result = 0;
 int k;
 
-
+//TODO: find out what nclassses and ntrees is in OpenCV3
 if( nclasses > 0 ) //classification
 {
 
@@ -81,16 +124,16 @@ if( nclasses > 0 ) //classification
     memset( votes, 0, sizeof(*votes)*nclasses );
     for( k = 0; k < ntrees; k++ )
     {
-        CvDTreeNode* predicted_node = trees[k]->predict( sample, cv::Mat());
-         int nvotes;
-         int class_idx = predicted_node->class_idx;
-         //double val = predicted_node->value;
-         //std::cout<<"class label:"<<val<<std::endl;
-        CV_Assert( 0 <= class_idx && class_idx < nclasses );
+      CvDTreeNode* predicted_node = trees[k]->predict( sample, cv::Mat());
+      int nvotes;
+      int class_idx = predicted_node->class_idx;
+      //double val = predicted_node->value;
+      //std::cout<<"class label:"<<val<<std::endl;
+      CV_Assert( 0 <= class_idx && class_idx < nclasses );
 
-       nvotes = ++votes[class_idx];
+      nvotes = ++votes[class_idx];
 
-       std::cout<<"class index:"<< class_idx <<std::endl;
+      std::cout<<"class index:"<< class_idx <<std::endl;
 
     }
 

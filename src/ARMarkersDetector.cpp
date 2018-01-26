@@ -42,7 +42,11 @@
 //aruco
 #include <aruco/aruco.h>
 #include <aruco/cvdrawingutils.h>
+#if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
+#elif CV_MAJOR_VERSION == 3
+#include <opencv2/highgui.hpp>
+#endif
 
 using namespace uima;
 class ARMarkersDetector : public DrawingAnnotator

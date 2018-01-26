@@ -9,10 +9,19 @@
 #include <yaml-cpp/yaml.h>
 #include<ros/package.h>
 #include<boost/filesystem.hpp>
+
+#if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/ml/ml.hpp>
+#elif CV_MAJOR_VERSION == 3
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/ml.hpp>
+#endif
+
 #include <rs_addons/RSClassifier.h>
 #include <rs_addons/RSGBT.h>
 
@@ -34,6 +43,7 @@ void RSGBT:: trainModel(std::string train_matrix_name, std::string train_label_n
 
   if(!pathToSaveModel.empty())
   {
+#if CV_MAJOR_VERSION == 2
     cv::Mat var_type = cv::Mat(train_matrix.cols + 1, 1, CV_8U);
     var_type.setTo(Scalar(CV_VAR_NUMERICAL));
     var_type.at<uchar>(train_matrix.cols, 0) = CV_VAR_CATEGORICAL;
@@ -57,11 +67,15 @@ void RSGBT:: trainModel(std::string train_matrix_name, std::string train_label_n
 
     //To save the trained data.............................
     gbtree->save((pathToSaveModel).c_str());
+#elif CV_MAJOR_VERSION == 3
+    //right know: do nothing
+#endif
   }
 }
 
 void RSGBT:: classify(std::string trained_file_name_saved, std::string test_matrix_name, std::string test_label_name, std::string obj_classInDouble)
 {
+#if CV_MAJOR_VERSION == 2
   cv::Mat test_matrix;
   cv::Mat test_label;
   readDescriptorAndLabel(test_matrix_name, test_label_name, test_matrix, test_label);
@@ -92,11 +106,14 @@ void RSGBT:: classify(std::string trained_file_name_saved, std::string test_matr
   }
   std::cout << "Gradient Boost Tree Result :" << std::endl;
   evaluation(actual_label, predicted_label, obj_classInDouble);
-
+#elif CV_MAJOR_VERSION == 3
+  //do nothing right now
+#endif
 }
 
 void RSGBT::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_mat, double &det, double &confi)
 {
+#if CV_MAJOR_VERSION == 2
   //To load the test data and it's label.............................
   std::cout << "size of test matrix :" << test_mat.size() << std::endl;
 
@@ -107,6 +124,9 @@ void RSGBT::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test
   double res = urtree->predict(test_mat, cv::Mat());
   std::cout << "prediction class is :" << res << std::endl;
   det = res;
+#elif CV_MAJOR_VERSION == 3
+  // right nothing right now
+#endif
 }
 
 void RSGBT::RsAnnotation(uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi)

@@ -1,18 +1,27 @@
 // Developed by: Rakib
 
-#include<iostream>
+#include <iostream>
 #include <vector>
 #include <fstream>
 #include <string>
 #include "opencv2/opencv.hpp"
 #include <map>
 #include <yaml-cpp/yaml.h>
-#include<ros/package.h>
-#include<boost/filesystem.hpp>
+#include <ros/package.h>
+#include <boost/filesystem.hpp>
+
+#if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/ml/ml.hpp>
+#elif CV_MAJOR_VERSION == 3
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/ml.hpp>
+#endif
+
 #include <rs_addons/RSClassifier.h>
 #include <rs_addons/RSSVM.h>
 
@@ -33,6 +42,7 @@ void RSSVM::trainModel(std::string train_matrix_name, std::string train_label_na
 
   if(!pathToSaveModel.empty())
   {
+#if CV_MAJOR_VERSION == 2
     //Set parameters for algorithm......................................
     CvSVMParams params = CvSVMParams(
           CvSVM::C_SVC,  //Type of SVM, here N classes
@@ -53,6 +63,26 @@ void RSSVM::trainModel(std::string train_matrix_name, std::string train_label_na
     my_svm->train_auto(train_matrix, train_label, cv::Mat(), cv::Mat(), params, 10);
     //my_svm->train(train_matrix, train_label, cv::Mat(), cv::Mat(), params);
 
+#elif CV_MAJOR_VERSION == 3
+
+    cv::Ptr<cv::ml::SVM> my_svm = cv::ml::SVM::create();
+
+    my_svm->setType(cv::ml::SVM::Types::C_SVC);
+    my_svm->setKernel(cv::ml::SVM::KernelTypes::LINEAR);
+    my_svm->setDegree(0.0);
+    my_svm->setGamma(0.0);
+    my_svm->setCoef0(0.0);
+    my_svm->setC(2);
+    my_svm->setNu(0);
+    my_svm->setP(0);
+    my_svm->setClassWeights(cv::Mat());
+    my_svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 1000, 0.000001));
+
+    //TODO: ROW_SAMPLE? Nothing about it in above
+    my_svm->train(train_matrix, cv::ml::ROW_SAMPLE, train_label);
+
+#endif
+
     //To save the trained data.............................
     my_svm->save((pathToSaveModel).c_str());
   }
@@ -69,13 +99,21 @@ void RSSVM::classify (std::string trained_file_name_saved,
   std::cout<<"size of test matrix :"<<test_matrix.size()<<std::endl;
   std::cout<<"size of test label"<<test_label.size()<<std::endl;
 
-  CvSVM* your_svm=new CvSVM ;
+#if CV_MAJOR_VERSION == 2
+  CvSVM* your_svm=new CvSVM;
+#elif CV_MAJOR_VERSION == 3
+  cv::Ptr<cv::ml::SVM> your_svm = cv::ml::SVM::create();
+#endif
 
   //To load the trained model..............................
   your_svm->load((loadTrained(trained_file_name_saved)).c_str());
 
   //To count the support vector................................
+#if CV_MAJOR_VERSION == 2
   int in= your_svm->get_support_vector_count();
+#elif CV_MAJOR_VERSION == 3
+  int in = your_svm->getSupportVectors().rows;
+#endif
   std::cout<<"The number of support vector:"<<in<<std::endl;
 
   //convert test label matrix into a vector
@@ -106,14 +144,21 @@ void RSSVM::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test
   //To load the test data and it's label.............................
   std::cout<<"size of test matrix :"<<test_mat.size()<<std::endl;
 
-  CvSVM* your_svm=new CvSVM ;
+#if CV_MAJOR_VERSION == 2
+  CvSVM* your_svm=new CvSVM;
+#elif CV_MAJOR_VERSION == 3
+  cv::Ptr<cv::ml::SVM> your_svm = cv::ml::SVM::create();
+#endif
 
   //To load the trained model..............................
   your_svm->load((loadTrained(trained_file_name_saved)).c_str());
 
   //To count the support vector................................
+#if CV_MAJOR_VERSION == 2
   int in= your_svm->get_support_vector_count();
-
+#elif CV_MAJOR_VERSION == 3
+  int in = your_svm->getSupportVectors().rows;
+#endif
   std::cout<<"The number of support vector:"<<in<<std::endl;
   double res = your_svm->predict(test_mat);
   det =res;
@@ -143,6 +188,12 @@ void RSSVM::RsAnnotation (uima::CAS &tcas, std::string class_name, std::string f
     outError("You should set the parameter (set_mode) as CL or GT"<<std::endl);
   }
 }
+
+#if CV_MAJOR_VERSION == 3
+int RSSVM::getVarCount(){
+  return cv::ml::SVM::getVarCount();
+}
+#endif
 
 RSSVM::~RSSVM()
 {

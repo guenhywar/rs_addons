@@ -11,7 +11,7 @@
 #include <rs_addons/RSGBT.h>
 #include <rs_addons/RSKNN.h>
 #include <rs/DrawingAnnotator.h>
-#include<boost/filesystem.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 using namespace uima;
