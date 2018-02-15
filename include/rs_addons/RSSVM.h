@@ -44,10 +44,44 @@ public:
   void RsAnnotation (uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi);
 
 #if CV_MAJOR_VERSION == 3
-  virtual int getVarCount();
+  // StatModel interface
+public:
+  int getVarCount() const;
+  bool isTrained() const;
+  bool isClassifier() const;
+  float predict(cv::InputArray samples, cv::OutputArray results, int flags) const;
+
+  // SVM interface
+public:
+  int getType() const;
+  void setType(int val);
+  double getGamma() const;
+  void setGamma(double val);
+  double getCoef0() const;
+  void setCoef0(double val);
+  double getDegree() const;
+  void setDegree(double val);
+  double getC() const;
+  void setC(double val);
+  double getNu() const;
+  void setNu(double val);
+  double getP() const;
+  void setP(double val);
+  cv::Mat getClassWeights() const;
+  void setClassWeights(const cv::Mat &val);
+  cv::TermCriteria getTermCriteria() const;
+  void setTermCriteria(const cv::TermCriteria &val);
+  int getKernelType() const;
+  void setKernel(int kernelType);
+  void setCustomKernel(const cv::Ptr<Kernel> &_kernel);
+  bool trainAuto(const cv::Ptr<cv::ml::TrainData> &data, int kFold, cv::ml::ParamGrid Cgrid, cv::ml::ParamGrid gammaGrid, cv::ml::ParamGrid pGrid, cv::ml::ParamGrid nuGrid, cv::ml::ParamGrid coeffGrid, cv::ml::ParamGrid degreeGrid, bool balanced);
+  cv::Mat getSupportVectors() const;
+  double getDecisionFunction(int i, cv::OutputArray alpha, cv::OutputArray svidx) const;
 #endif
 
   ~ RSSVM();
+
+
 };
 
 #endif
