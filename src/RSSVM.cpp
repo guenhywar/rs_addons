@@ -189,12 +189,6 @@ void RSSVM::RsAnnotation (uima::CAS &tcas, std::string class_name, std::string f
   }
 }
 
-#if CV_MAJOR_VERSION == 3
-int RSSVM::getVarCount(){
-  return cv::ml::SVM::getVarCount();
-}
-#endif
-
 RSSVM::~RSSVM()
 {
 }
