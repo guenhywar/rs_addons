@@ -1,29 +1,37 @@
 // Developed by: Rakib
 
-#include<iostream>
+#include <iostream>
 #include <ros/ros.h>
+#include <opencv2/opencv.hpp>
+
+#if CV_MAJOR_VERSION == 2
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <sensor_msgs/image_encodings.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/ml/ml.hpp>
+#elif CV_MAJOR_VERSION == 3
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/ml.hpp>
+#endif
+
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <vector>
 #include <fstream>
 #include <string>
-#include "opencv2/opencv.hpp"
 #include <boost/filesystem.hpp>
-#include<ros/package.h>
+#include <boost/program_options.hpp>
+#include <ros/package.h>
 #include <rs/recognition/CaffeProxy.h>
 #include <dirent.h>
 #include <yaml-cpp/yaml.h>
 #include <pcl/io/pcd_io.h>
-#include<algorithm>
+#include <algorithm>
 #include <iterator>
 #include <pcl/features/vfh.h>
 #include <pcl/features/normal_3d.h>
-#include <boost/program_options.hpp>
 #include <pcl/features/cvfh.h>
 #include <pcl/features/our_cvfh.h>
 
@@ -38,9 +46,20 @@ void readClassLabel( std::string obj_file_path, std::vector <std::pair < string,
 {
   cv::FileStorage fs;
   fs.open(obj_file_path, cv::FileStorage::READ);
-  std::vector<std::string> classes;
 
+
+  std::vector<std::string> classes;
+#if CV_MAJOR_VERSION == 2
   fs["classes"] >> classes;
+#elif CV_MAJOR_VERSION == 3
+  cv::FileNode classesNode = fs["classes"];
+  cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
+
+  for( ; it != it_end; ++it)
+  {
+    classes.push_back((std::string)*it);
+  }
+#endif
 
   if(classes.empty())
   {
@@ -50,27 +69,36 @@ void readClassLabel( std::string obj_file_path, std::vector <std::pair < string,
   else
   {
     for(auto c : classes)
-
-    {   double clslabel = clslabel+1;
+    {
+      double clslabel = clslabel+1;
 
       std::vector<std::string> subclasses;
+#if CV_MAJOR_VERSION == 2
       fs[c] >> subclasses;
+#elif CV_MAJOR_VERSION == 3
+      cv::FileNode subClassesNode = fs[c];
+      cv::FileNodeIterator it = subClassesNode.begin(), it_end = subClassesNode.end();
+
+      for( ; it != it_end; ++it)
+      {
+        subclasses.push_back((std::string)*it);
+      }
+#endif
 
       //To set the map between string and double classlabel
       objectToClassLabelMap.push_back(std::pair< std::string,float >(c , clslabel ));
 
       if(!subclasses.empty())
+      {
         for(auto sc : subclasses)
         {
-
           objectToLabel.push_back(std::pair< std::string,float >(sc , clslabel ));
         }
+      }
       else
       {
-
         objectToLabel.push_back(std::pair< std::string,float >(c, clslabel ));
       }
-
     }
   }
 
@@ -106,9 +134,19 @@ void readClassLabelWU( std::string obj_file_path, std::vector <std::pair < strin
 {
   cv::FileStorage fs;
   fs.open(obj_file_path, cv::FileStorage::READ);
-  std::vector<std::string> classes;
 
+  std::vector<std::string> classes;
+#if CV_MAJOR_VERSION == 2
   fs["classes"] >> classes;
+#elif CV_MAJOR_VERSION == 3
+  cv::FileNode classesNode = fs["classes"];
+  cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
+
+  for( ; it != it_end; ++it)
+  {
+    classes.push_back((std::string)*it);
+  }
+#endif
 
   if(classes.empty())
   {
@@ -124,9 +162,19 @@ void readClassLabelWU( std::string obj_file_path, std::vector <std::pair < strin
 
       objectToClassLabelMap.push_back(std::pair< std::string,float >(classes[i], clslabel ));
 
+      std::vector<std::string> subclasses;     
 
-      std::vector<std::string> subclasses;
+#if CV_MAJOR_VERSION == 2
       fs[classes[i]] >> subclasses;
+#elif CV_MAJOR_VERSION == 3
+      cv::FileNode classesNode = fs[classes[i]];
+      cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
+
+      for( ; it != it_end; ++it)
+      {
+        classes.push_back((std::string)*it);
+      }
+#endif
 
       if(!subclasses.empty())
 
@@ -469,7 +517,7 @@ void extractCaffeFeature(std::string featType, const  std::map<double, std::vect
   }
   else
   {
-    std::cerr<<"CAFFE_MODEL_FILE and CAFFE_TRAINED_FILE are not found"<<std::cout;
+    std::cerr<<"CAFFE_MODEL_FILE and CAFFE_TRAINED_FILE are not found"<<std::endl;
     exit(0);
   }
 
