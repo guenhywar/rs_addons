@@ -23,7 +23,7 @@
 
 #include <boost/program_options.hpp>
 
-#define TRAIN_DIR "/objects_dataset/partial_views/"
+#define TRAIN_DIR "/objects_dataset/object_data/partial_views/"
 
 #define CAFFE_MODEL_FILE  "/caffe/models/bvlc_reference_caffenet/deploy.prototxt"
 #define CAFFE_TRAINED_FILE  "/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel"
