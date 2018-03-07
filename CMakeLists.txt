@@ -88,7 +88,7 @@ else(aruco_FOUND)
 endif(aruco_FOUND)
 
 if(Caffe_FOUND)
-    add_executable(featureExtractor src/ext/FeatureExtractor.cpp)
+    add_executable(featureExtractor src/tools/FeatureExtractor.cpp)
     target_link_libraries(featureExtractor
         ${PCL_LIBRARIES}
         ${catkin_LIBRARIES}
