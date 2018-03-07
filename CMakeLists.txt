@@ -109,75 +109,48 @@ if(Caffe_FOUND)
         )
 endif(Caffe_FOUND)
 
-rs_add_library(rs_svmAnnotator 
-    src/SvmAnnotator.cpp
-    src/RSClassifier.cpp
-    src/RSSVM.cpp
+
+add_library(rs_classifiers src/RSClassifier.cpp
+                           src/RSSVM.cpp
+                           src/RSRF.cpp
+                           src/RSKNN.cpp
+                           src/RSGBT.cpp)
+target_link_libraries(rs_classifiers ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
+
+
+rs_add_library(rs_svmAnnotator src/SvmAnnotator.cpp)
+target_link_libraries(rs_svmAnnotator rs_classifiers
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES})
+
+rs_add_library(rs_rfAnnotator src/RfAnnotator.cpp)
+target_link_libraries(rs_rfAnnotator rs_classifiers
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES})
+
+
+rs_add_library(rs_knnAnnotator src/KnnAnnotator.cpp)
+target_link_libraries(rs_knnAnnotator rs_classifiers
+    ${CATKIN_LIBRARIES}
+    ${OpenCV_LIBRARIES})
+
+rs_add_library(rs_gbAnnotator src/GbAnnotator.cpp)
+target_link_libraries(rs_gbAnnotator rs_classifiers
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
     )
-target_link_libraries(rs_svmAnnotator 
+
+#this should be an executable
+rs_add_library(rs_trainerAnnotator src/TrainerAnnotator.cpp)
+target_link_libraries(rs_trainerAnnotator rs_classifiers
     ${CATKIN_LIBRARIES}
     ${OpenCV_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${PCL_LIBRARIES}
-    )
-rs_add_library(rs_rfAnnotator 
-    src/RfAnnotator.cpp
-    src/RSClassifier.cpp
-    src/RSRF.cpp
-    )
-target_link_libraries(rs_rfAnnotator 
+    ${Boost_LIBRARIES})
+
+# this needs to be renamed...if this is just for running test
+# data trhough the system it can an executable
+rs_add_library(rs_classifyOfflineAnnotator src/ClassifyOfflineAnnotator.cpp)
+target_link_libraries(rs_classifyOfflineAnnotator rs_classifiers
     ${CATKIN_LIBRARIES}
     ${OpenCV_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${PCL_LIBRARIES}
-    )
-rs_add_library(rs_knnAnnotator 
-    src/KnnAnnotator.cpp
-    src/RSClassifier.cpp
-    src/RSKNN.cpp
-    )
-target_link_libraries(rs_knnAnnotator 
-    ${CATKIN_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${PCL_LIBRARIES}
-    )
-rs_add_library(rs_gbAnnotator 
-    src/GbAnnotator.cpp
-    src/RSClassifier.cpp
-    src/RSGBT.cpp
-    )
-target_link_libraries(rs_gbAnnotator 
-    ${CATKIN_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${PCL_LIBRARIES}
-    )
-rs_add_library(rs_trainerAnnotator 
-    src/TrainerAnnotator.cpp
-    src/RSClassifier.cpp
-    src/RSRF.cpp
-    src/RSSVM.cpp
-    src/RSGBT.cpp
-    src/RSKNN.cpp
-    )
-target_link_libraries(rs_trainerAnnotator 
-    ${CATKIN_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${PCL_LIBRARIES}
-    )
-rs_add_library(rs_classifyOfflineAnnotator 
-    src/ClassifyOfflineAnnotator.cpp
-    src/RSClassifier.cpp
-    src/RSRF.cpp
-    src/RSSVM.cpp
-    src/RSGBT.cpp
-    src/RSKNN.cpp
-    )
-target_link_libraries(rs_classifyOfflineAnnotator 
-    ${CATKIN_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${PCL_LIBRARIES}
-    )
+    ${Boost_LIBRARIES})
