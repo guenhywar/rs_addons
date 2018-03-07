@@ -107,45 +107,45 @@ void RSRF:: trainModel(std::string train_matrix_name, std::string train_label_na
   }
 }
 
-int RSRF::predict_multi_class(cv::Mat sample, cv::AutoBuffer<int>& out_votes)
-{
-#if CV_MAJOR_VERSION == 2
-int result = 0;
-int k;
+//int RSRF::predict_multi_class(cv::Mat sample, cv::AutoBuffer<int>& out_votes)
+//{
+//#if CV_MAJOR_VERSION == 2
+//int result = 0;
+//int k;
 
-//TODO: find out what nclassses and ntrees is in OpenCV3
-if( nclasses > 0 ) //classification
-{
+////TODO: find out what nclassses and ntrees is in OpenCV3
+//if( nclasses > 0 ) //classification
+//{
 
-    int* votes = out_votes;
-    std::cout<<"number of trees:"<<ntrees<<std::endl;
-    std::cout<<"number of n-classes:"<<nclasses<<std::endl;
-    std::cout<<"size of memory:"<<sizeof(*votes)<<std::endl;
-    memset( votes, 0, sizeof(*votes)*nclasses );
-    for( k = 0; k < ntrees; k++ )
-    {
-      CvDTreeNode* predicted_node = trees[k]->predict( sample, cv::Mat());
-      int nvotes;
-      int class_idx = predicted_node->class_idx;
-      //double val = predicted_node->value;
-      //std::cout<<"class label:"<<val<<std::endl;
-      CV_Assert( 0 <= class_idx && class_idx < nclasses );
+//    int* votes = out_votes;
+//    std::cout<<"number of trees:"<<ntrees<<std::endl;
+//    std::cout<<"number of n-classes:"<<nclasses<<std::endl;
+//    std::cout<<"size of memory:"<<sizeof(*votes)<<std::endl;
+//    memset( votes, 0, sizeof(*votes)*nclasses );
+//    for( k = 0; k < ntrees; k++ )
+//    {
+//      CvDTreeNode* predicted_node = trees[k]->predict( sample, cv::Mat());
+//      int nvotes;
+//      int class_idx = predicted_node->class_idx;
+//      //double val = predicted_node->value;
+//      //std::cout<<"class label:"<<val<<std::endl;
+//      CV_Assert( 0 <= class_idx && class_idx < nclasses );
 
-      nvotes = ++votes[class_idx];
+//      nvotes = ++votes[class_idx];
 
-      std::cout<<"class index:"<< class_idx <<std::endl;
+//      std::cout<<"class index:"<< class_idx <<std::endl;
 
-    }
+//    }
 
-    result = ntrees;
-}
+//    result = ntrees;
+//}
 
-return result;
-#elif CV_MAJOR_VERSION == 3
-  return 0;//cv::ml::RTrees::getRoots().size();
-#endif
+//return result;
+//#elif CV_MAJOR_VERSION == 3
+//  return 0;//cv::ml::RTrees::getRoots().size();
+//#endif
 
-}
+//}
 
 void RSRF::classify(std::string trained_file_name_saved, std::string test_matrix_name, std::string test_label_name, std::string obj_classInDouble)
 {
@@ -156,41 +156,42 @@ void RSRF::classify(std::string trained_file_name_saved, std::string test_matrix
   std::cout << "size of test label" << test_label.size() << std::endl;
 
 
-  //To load the trained data................................
+  //To load the trained data
 #if CV_MAJOR_VERSION == 2
-  load((loadTrained(trained_file_name_saved)).c_str());
+  CvRTrees* rtree = new CvRTrees;
+  rtree->load((loadTrained(trained_file_name_saved)).c_str());
 
-  int numberOfCls=nclasses;
-  int sizeOfTree=ntrees;
-  std::cout<<numberOfCls<<sizeOfTree;
+//  int numberOfCls=nclasses;
+//  int sizeOfTree=ntrees;
+//  std::cout<<numberOfCls<<sizeOfTree;
 #elif CV_MAJOR_VERSION == 3
   cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::loadFromString<cv::ml::RTrees>((loadTrained(trained_file_name_saved)).c_str());
 #endif
 
-  //convert test label matrix into a vector.......................
+  //convert test label matrix into a vector
   std::vector<double> con_test_label;
   test_label.col(0).copyTo(con_test_label);
 
-  //Container to hold the integer value of labels............................
+  //Container to hold the integer value of labels
   std::vector<int> actual_label;
   std::vector<int> predicted_label;
-   cv::AutoBuffer<int> out_votes;
+//  cv::AutoBuffer<int> out_votes;
 
   for(int i = 0; i < test_label.rows; i++)
   {
 #if CV_MAJOR_VERSION == 2
-      double res = predict(test_matrix.row(i), cv::Mat());
+      double res = rtree->predict(test_matrix.row(i), cv::Mat());
 #elif CV_MAJOR_VERSION == 3
       double res = rtree->predict(test_matrix.row(i), cv::Mat());
 #endif
       int prediction = res;
 
-      int class_index=res-1;
-      double numberOfTrees=predict_multi_class(test_matrix.row(i), out_votes);
+//      int class_index=res-1;
+//      double numberOfTrees=predict_multi_class(test_matrix.row(i), out_votes);
 
-      std::cout<<"number of trees: "<<numberOfTrees<<std::endl;
-      std::cout<<"class : "<<res <<" gets : "<<out_votes[class_index]<<" votes"<<std::endl;
-      std::cout<<"confidence of the RF Classifier: "<<out_votes[class_index]/numberOfTrees<<std::endl;
+//      std::cout<<"number of trees: "<<numberOfTrees<<std::endl;
+//      std::cout<<"class : "<<res <<" gets : "<<out_votes[class_index]<<" votes"<<std::endl;
+//      std::cout<<"confidence of the RF Classifier: "<<out_votes[class_index]/numberOfTrees<<std::endl;
 
       predicted_label.push_back(prediction);
       double lab = con_test_label[i];
@@ -207,25 +208,24 @@ void RSRF::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_
      //To load the test data.............................
      std::cout << "size of test matrix :" << test_mat.size() << std::endl;
 
-     //CvRTrees *vrtree = new CvRTrees;
-
      //To load the trained data................................
 #if CV_MAJOR_VERSION == 2
-     load((loadTrained(trained_file_name_saved)).c_str());
-     double res = predict(test_mat, cv::Mat());
+     CvRTrees rtree;//= new cv::CvRTrees();
+     rtree.load((loadTrained(trained_file_name_saved)).c_str());
+     double res = rtree.predict(test_mat, cv::Mat());
 #elif CV_MAJOR_VERSION == 3
      cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::loadFromString<cv::ml::RTrees>((loadTrained(trained_file_name_saved)).c_str());
      double res = rtree->predict(test_mat, cv::Mat());
 #endif
 
      int class_index=res-1;
-     double numberOfTrees=predict_multi_class(test_mat, out_votes);
-     double con=out_votes[class_index]/numberOfTrees;
-     std::cout<<"number of trees: "<<numberOfTrees<<std::endl;
+//     double numberOfTrees=predict_multi_class(test_mat, out_votes);
+//     double con=out_votes[class_index]/numberOfTrees;
+//     std::cout<<"number of trees: "<<numberOfTrees<<std::endl;
      std::cout<<"class : "<<res <<" gets : "<<out_votes[class_index]<<" votes"<<std::endl;
-     std::cout<<"confidence of the RF Classifier: "<<con<<std::endl;
+//     std::cout<<"confidence of the RF Classifier: "<<con<<std::endl;
      det = res;
-     confi=con;
+//     confi=con;
 }
 
 void RSRF::RsAnnotation(uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi)

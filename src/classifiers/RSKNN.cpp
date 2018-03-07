@@ -140,10 +140,10 @@ void RSKNN::classifyOnLiveDataKNN(std::string train_matrix_name, std::string tra
   CvKNearest* knncalldc = new CvKNearest;
 
   //Train the classifier...................................
-  knncalld->train(train_matrix, train_label, cv::Mat(), false, k,false);
+  knncalldc->train(train_matrix, train_label, cv::Mat(), false, k,false);
 
   //To get the value of k.............
-  int k_max = knncalld->get_max_k();
+  int k_max = knncalldc->get_max_k();
   //cv::Mat neighborResponses, bestResponse, distances;
 
   //double res = knnclsa->find_nearest(test_mat, k, bestResponse, neighborResponses, distances);
