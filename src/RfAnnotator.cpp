@@ -21,8 +21,7 @@
 
 #include<ros/package.h>
 #include<boost/filesystem.hpp>
-#include <rs_addons/RSClassifier.h>
-#include <rs_addons/RSRF.h>
+#include <rs_addons/classifiers/RSRF.h>
 #include <rs/DrawingAnnotator.h>
 
 using namespace uima;

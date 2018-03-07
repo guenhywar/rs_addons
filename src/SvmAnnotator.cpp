@@ -2,10 +2,8 @@
 
 #include <uima/api.hpp>
 #include <iostream>
+#include <vector>
 #include <pcl/point_types.h>
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
 
 #if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
@@ -20,14 +18,13 @@
 #endif
 
 #include <ros/package.h>
-#include <boost/filesystem.hpp>
-#include <rs_addons/RSClassifier.h>
-#include <rs_addons/RSSVM.h>
-#include <pcl/visualization/cloud_viewer.h>
+
+#include <rs/types/all_types.h>
+#include <rs/scene_cas.h>
+#include <rs/utils/time.h>
 #include <rs/DrawingAnnotator.h>
-#include <boost/algorithm/string.hpp>
-#include <iostream>
-#include <vector>
+
+#include <rs_addons/classifiers/RSSVM.h>
 
 using namespace uima;
 

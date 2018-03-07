@@ -2,15 +2,17 @@
 
 #include <uima/api.hpp>
 #include <pcl/point_types.h>
+
 #include <rs/types/all_types.h>
 #include <rs/scene_cas.h>
 #include <rs/utils/time.h>
-#include <rs_addons/RSClassifier.h>
-#include <rs_addons/RSSVM.h>
-#include <rs_addons/RSRF.h>
-#include <rs_addons/RSGBT.h>
-#include <rs_addons/RSKNN.h>
 #include <rs/DrawingAnnotator.h>
+
+#include <rs_addons/classifiers/RSSVM.h>
+#include <rs_addons/classifiers/RSRF.h>
+#include <rs_addons/classifiers/RSGBT.h>
+#include <rs_addons/classifiers/RSKNN.h>
+
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 

@@ -110,12 +110,12 @@ if(Caffe_FOUND)
 endif(Caffe_FOUND)
 
 
-add_library(rs_classifiers src/RSClassifier.cpp
-                           src/RSSVM.cpp
-                           src/RSRF.cpp
-                           src/RSKNN.cpp
-                           src/RSGBT.cpp)
-target_link_libraries(rs_classifiers ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
+add_library(rs_classifiers src/classifiers/RSClassifier.cpp
+                           src/classifiers/RSSVM.cpp
+                           src/classifiers/RSRF.cpp
+                           src/classifiers/RSKNN.cpp
+                           src/classifiers/RSGBT.cpp)
+target_link_libraries(rs_classifiers ${OpenCV_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 
 rs_add_library(rs_svmAnnotator src/SvmAnnotator.cpp)

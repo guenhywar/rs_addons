@@ -19,7 +19,7 @@
 #include <opencv2/ml.hpp>
 #endif
 
-#include <rs_addons/RSClassifier.h>
+#include <rs_addons/classifiers/RSClassifier.h>
 
 class RSGBT : public RSClassifier
 {

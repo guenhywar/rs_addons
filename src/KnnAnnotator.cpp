@@ -3,9 +3,6 @@
 #include <uima/api.hpp>
 #include <iostream>
 #include <pcl/point_types.h>
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
 
 #if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
@@ -20,10 +17,13 @@
 #endif
 
 #include <ros/package.h>
-#include <boost/filesystem.hpp>
-#include <rs_addons/RSClassifier.h>
-#include <rs_addons/RSKNN.h>
+
+#include <rs/types/all_types.h>
+#include <rs/scene_cas.h>
+#include <rs/utils/time.h>
 #include <rs/DrawingAnnotator.h>
+
+#include <rs_addons/classifiers/RSKNN.h>
 
 using namespace uima;
 
