@@ -47,16 +47,23 @@ public:
 
   void readDescriptorAndLabel(std::string matrix_name, std::string label_name, cv::Mat &des_matrix, cv::Mat &des_label);
   
+  //save model file
   std::string saveTrained(std::string trained_file_name);
-   std::string loadTrained(std::string trained_file_name);
+
+  //load the model file
+  std::string loadTrained(std::string trained_file_name);
   
+  //some eval...what does it do?
   void evaluation(std::vector<int> test_label, std::vector<int> predicted_label,std::string obj_classInDouble);
 
+  //probably draws a cluster on the image
   void drawCluster(cv::Mat input , cv::Rect rect, const std::string &label);
 
+  //what is this?
   void  processPCLFeature(std::string memory_name,std::string set_mode, std::string dataset_use,std::string feature_use,
                           std::vector<Cluster> clusters, RSClassifier* obj_VFH , cv::Mat &color, std::vector<std::string> models_label , uima::CAS &tcas);
 
+  //what about this?
   void  processCaffeFeature(std::string memory_name, std::string set_mode, std::string dataset_use, std::string feature_use, std::vector<Cluster> clusters, RSClassifier* obj_caffe ,
                             cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas );
 

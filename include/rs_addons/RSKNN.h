@@ -51,7 +51,7 @@ public:
   void processPCLFeatureKNN(std::string train_matrix_name,std::string train_label_name,std::string set_mode, std::string dataset_use,std::string feature_use,
                             std::vector<rs::Cluster> clusters, RSKNN *obj_VFH, cv::Mat &color,std::vector<std::string> models_label, uima::CAS &tcas);
 
-  void  processCaffeFeatureKNN(std::string train_matrix_name,std::string train_label_name,
+  void processCaffeFeatureKNN(std::string train_matrix_name,std::string train_label_name,
                                std::string set_mode, std::string dataset_use,std::string feature_use, std::vector<rs::Cluster> clusters,
                                RSKNN *obj_caffe, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas);
 

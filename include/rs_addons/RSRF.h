@@ -28,9 +28,9 @@
 #include <rs/DrawingAnnotator.h>
 
 #if CV_MAJOR_VERSION == 2
-class RSRF : public RSClassifier, public CvRTrees
+class RSRF : public RSClassifier
 #elif CV_MAJOR_VERSION == 3
-class RSRF : public RSClassifier, public cv::ml::RTrees
+class RSRF : public RSClassifier
 #endif
 {
 
@@ -48,52 +48,7 @@ public:
 
   void RsAnnotation (uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi);
 
-#if CV_MAJOR_VERSION == 3
-  // StatModel interface
-public:
-  int getVarCount() const;
-  bool isTrained() const;
-  bool isClassifier() const;
-  float predict(cv::InputArray samples, cv::OutputArray results, int flags) const;
-
-  // DTrees interface
-public:
-  int getMaxCategories() const;
-  void setMaxCategories(int val);
-  int getMaxDepth() const;
-  void setMaxDepth(int val);
-  int getMinSampleCount() const;
-  void setMinSampleCount(int val);
-  int getCVFolds() const;
-  void setCVFolds(int val);
-  bool getUseSurrogates() const;
-  void setUseSurrogates(bool val);
-  bool getUse1SERule() const;
-  void setUse1SERule(bool val);
-  bool getTruncatePrunedTree() const;
-  void setTruncatePrunedTree(bool val);
-  float getRegressionAccuracy() const;
-  void setRegressionAccuracy(float val);
-  cv::Mat getPriors() const;
-  void setPriors(const cv::Mat &val);
-  const std::vector<int> &getRoots() const;
-  const std::vector<cv::ml::DTrees::Node> &getNodes() const;
-  const std::vector<cv::ml::DTrees::Split> &getSplits() const;
-  const std::vector<int> &getSubsets() const;
-
-  // RTrees interface
-public:
-  bool getCalculateVarImportance() const;
-  void setCalculateVarImportance(bool val);
-  int getActiveVarCount() const;
-  void setActiveVarCount(int val);
-  cv::TermCriteria getTermCriteria() const;
-  void setTermCriteria(const cv::TermCriteria &val);
-  cv::Mat getVarImportance() const;
-#endif
-
   ~ RSRF();
-
 
 };
 

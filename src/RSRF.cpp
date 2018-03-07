@@ -84,7 +84,6 @@ void RSRF:: trainModel(std::string train_matrix_name, std::string train_label_na
                                                                  var_type //varType
                                                                  );
 
-
     cv::Ptr<cv::ml::RTrees> rtree = cv::ml::RTrees::create();
 
     rtree->setMaxDepth(25);
@@ -143,12 +142,12 @@ if( nclasses > 0 ) //classification
 
 return result;
 #elif CV_MAJOR_VERSION == 3
-  return cv::ml::RTrees::getRoots().size();
+  return 0;//cv::ml::RTrees::getRoots().size();
 #endif
 
 }
 
-void RSRF:: classify(std::string trained_file_name_saved, std::string test_matrix_name, std::string test_label_name, std::string obj_classInDouble)
+void RSRF::classify(std::string trained_file_name_saved, std::string test_matrix_name, std::string test_label_name, std::string obj_classInDouble)
 {
   cv::Mat test_matrix;
   cv::Mat test_label;
@@ -165,7 +164,7 @@ void RSRF:: classify(std::string trained_file_name_saved, std::string test_matri
   int sizeOfTree=ntrees;
   std::cout<<numberOfCls<<sizeOfTree;
 #elif CV_MAJOR_VERSION == 3
-  cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::loadFromString<RTrees>((loadTrained(trained_file_name_saved)).c_str());
+  cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::loadFromString<cv::ml::RTrees>((loadTrained(trained_file_name_saved)).c_str());
 #endif
 
   //convert test label matrix into a vector.......................
@@ -215,7 +214,7 @@ void RSRF::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_
      load((loadTrained(trained_file_name_saved)).c_str());
      double res = predict(test_mat, cv::Mat());
 #elif CV_MAJOR_VERSION == 3
-     cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::loadFromString<RTrees>((loadTrained(trained_file_name_saved)).c_str());
+     cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::loadFromString<cv::ml::RTrees>((loadTrained(trained_file_name_saved)).c_str());
      double res = rtree->predict(test_mat, cv::Mat());
 #endif
 
