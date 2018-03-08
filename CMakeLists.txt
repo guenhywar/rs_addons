@@ -88,7 +88,7 @@ else(aruco_FOUND)
 endif(aruco_FOUND)
 
 if(Caffe_FOUND)
-    add_executable(featureExtractor src/tools/FeatureExtractor.cpp)
+    add_executable(featureExtractor src/tools/feature_extractor.cpp)
     target_link_libraries(featureExtractor
         ${PCL_LIBRARIES}
         ${catkin_LIBRARIES}
@@ -117,6 +117,12 @@ add_library(rs_classifiers src/classifiers/RSClassifier.cpp
                            src/classifiers/RSGBT.cpp)
 target_link_libraries(rs_classifiers ${OpenCV_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+#this should be an executable
+add_executable(train_classifier src/tools/classifier_trainer.cpp)
+target_link_libraries(train_classifier rs_classifiers
+        ${CATKIN_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        ${Boost_LIBRARIES})
 
 rs_add_library(rs_svmAnnotator src/SvmAnnotator.cpp)
 target_link_libraries(rs_svmAnnotator rs_classifiers
@@ -139,13 +145,6 @@ target_link_libraries(rs_gbAnnotator rs_classifiers
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
     )
-
-#this should be an executable
-rs_add_library(rs_trainerAnnotator src/TrainerAnnotator.cpp)
-target_link_libraries(rs_trainerAnnotator rs_classifiers
-    ${CATKIN_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    ${Boost_LIBRARIES})
 
 # this needs to be renamed...if this is just for running test
 # data trhough the system it can an executable

@@ -41,50 +41,43 @@ namespace po = boost::program_options;
 
 
 //To read the split file for both the IAI dataset and BOTH datasets from rs_resource/object_datasets/splits folder
-void readClassLabel( std::string obj_file_path, std::vector <std::pair < string, double> > &objectToLabel,
+void readClassLabel( std::string obj_file_path,
+                     std::vector <std::pair < string, double> > &objectToLabel,
                      std::vector <std::pair < string, double> > &objectToClassLabelMap)
 {
   cv::FileStorage fs;
   fs.open(obj_file_path, cv::FileStorage::READ);
-
-
   std::vector<std::string> classes;
 #if CV_MAJOR_VERSION == 2
   fs["classes"] >> classes;
 #elif CV_MAJOR_VERSION == 3
   cv::FileNode classesNode = fs["classes"];
   cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
-
   for( ; it != it_end; ++it)
   {
     classes.push_back((std::string)*it);
   }
 #endif
-
   if(classes.empty())
   {
     std::cout << "Object file has no classes defined" << std::endl;
-
   }
   else
   {
     for(auto c : classes)
     {
       double clslabel = clslabel+1;
-
       std::vector<std::string> subclasses;
 #if CV_MAJOR_VERSION == 2
       fs[c] >> subclasses;
 #elif CV_MAJOR_VERSION == 3
       cv::FileNode subClassesNode = fs[c];
       cv::FileNodeIterator it = subClassesNode.begin(), it_end = subClassesNode.end();
-
       for( ; it != it_end; ++it)
       {
         subclasses.push_back((std::string)*it);
       }
 #endif
-
       //To set the map between string and double classlabel
       objectToClassLabelMap.push_back(std::pair< std::string,float >(c , clslabel ));
 
@@ -101,31 +94,22 @@ void readClassLabel( std::string obj_file_path, std::vector <std::pair < string,
       }
     }
   }
-
   fs.release();
-
-
   if(!objectToClassLabelMap.empty()) {
     std::cout<<"objectToClassLabelMap:"<<std::endl;
-
     for(int i=0; i<objectToClassLabelMap.size(); i++)
-    {
-      std::cout<< objectToClassLabelMap[i].first <<"::"<<objectToClassLabelMap[i].second<< std::endl;
-    }
+        std::cout<< objectToClassLabelMap[i].first <<"::"<<objectToClassLabelMap[i].second<< std::endl;
+  }
+  std::cout<<std::endl;
 
-  }      std::cout<<std::endl;
-
-
-  if(!objectToLabel.empty()) {
+  if(!objectToLabel.empty())
+  {
     std::cout<<"objectToLabel:"<<std::endl;
-    for(int i=0; i<objectToLabel.size(); i++){
+    for(int i=0; i<objectToLabel.size(); i++)
       std::cout<< objectToLabel[i].first <<"::"<<objectToLabel[i].second<< std::endl;
-    }
 
-  }      std::cout<<std::endl;
-
-
-
+  }
+  std::cout<<std::endl;
 }
 
 //To read the split file for Washington Uni........................................
@@ -134,36 +118,28 @@ void readClassLabelWU( std::string obj_file_path, std::vector <std::pair < strin
 {
   cv::FileStorage fs;
   fs.open(obj_file_path, cv::FileStorage::READ);
-
   std::vector<std::string> classes;
 #if CV_MAJOR_VERSION == 2
   fs["classes"] >> classes;
 #elif CV_MAJOR_VERSION == 3
   cv::FileNode classesNode = fs["classes"];
   cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
-
   for( ; it != it_end; ++it)
   {
     classes.push_back((std::string)*it);
   }
 #endif
-
   if(classes.empty())
   {
     std::cout << "Object file has no classes defined" << std::endl;
-
   }
   else
   {
     for(int i=0; i<classes.size();i++)
-
     {
       double clslabel = clslabel+1;
-
       objectToClassLabelMap.push_back(std::pair< std::string,float >(classes[i], clslabel ));
-
-      std::vector<std::string> subclasses;     
-
+      std::vector<std::string> subclasses;
 #if CV_MAJOR_VERSION == 2
       fs[classes[i]] >> subclasses;
 #elif CV_MAJOR_VERSION == 3
@@ -175,40 +151,30 @@ void readClassLabelWU( std::string obj_file_path, std::vector <std::pair < strin
         classes.push_back((std::string)*it);
       }
 #endif
-
       if(!subclasses.empty())
-
         for(int j=0; j<subclasses.size(); j++)
-
         {
 
           if(j==0)
           {
             objectToLabelTest.push_back(std::pair< std::string,float >(subclasses[j] , clslabel ));
           }
-
           else
           {
             objectToLabelTrain.push_back(std::pair< std::string,float >(subclasses[j] , clslabel ));
           }
         }
-
     }
   }
-
   fs.release();
-
   if(!objectToClassLabelMap.empty())
   {
     std::cout<<"objectToClassLabel:"<<std::endl;
-
     for(int i=0; i<objectToClassLabelMap.size(); i++)
     {
       std::cout<< objectToClassLabelMap[i].first <<"::"<<objectToClassLabelMap[i].second<< std::endl;
     }
-
   }
-
   if(!objectToLabelTest.empty())
   {
     std::cout<<"objectToLabelTest:"<<std::endl;
@@ -217,7 +183,6 @@ void readClassLabelWU( std::string obj_file_path, std::vector <std::pair < strin
       std::cout<< objectToLabelTest[i].first <<"::"<<objectToLabelTest[i].second<< std::endl;
     }
   }
-
   if(!objectToLabelTrain.empty())
   {
     std::cout<<"objectToLabelTrain:"<<std::endl;
@@ -225,12 +190,8 @@ void readClassLabelWU( std::string obj_file_path, std::vector <std::pair < strin
     {
       std::cout<< objectToLabelTrain[i].first <<"::"<<objectToLabelTrain[i].second<< std::endl;
     }
-
   }
-
 }
-
-
 
 void getParentDir(std::string path_storage , std::vector<std::string>& updir_wu_folder)
 {
@@ -243,17 +204,12 @@ void getParentDir(std::string path_storage , std::vector<std::string>& updir_wu_
       updir_wu_folder.push_back(ent->d_name);
 
     }
-
   }
   else
   {
     std::cout << "Intermediate directory folder is not found" <<std::endl;
   }
-
-
 }
-
-
 
 //To read all the objects from rs_resources/objects_dataset folder.....................
 void getFiles(const std::string &resourchPath, std::string storage_fol, std::vector <std::pair < string, double> > object_label,
@@ -263,16 +219,11 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
   DIR *classdp;
   struct dirent *classdirp;
   size_t pos;
-
   for(auto const & p : object_label)
   {
-
     std::string pathToObj;
-
-
     if(dataset_input=="IAI")
     {
-
       if( !boost::filesystem::exists(boost::filesystem::path(path_to_data+storage_fol)) )
       {
         std::cout<<"*********************************************************************************************"<<std::endl;
@@ -280,15 +231,11 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
         std::cerr<<"You have selected storage folder(" <<storage_fol<< "), which does not exist " <<std::endl;
         std::cerr << "The storage folder should be in path:" <<path_to_data<< std::endl<<std::endl;
         std::exit(0);
-
       }
-
       pathToObj=path_to_data+storage_fol+'/'+p.first;
     }
-
     else if(dataset_input== "WU")
     {
-
       if( !boost::filesystem::exists(boost::filesystem::path(path_to_data+storage_fol)) )
       {
         std::cout<<"*********************************************************************************************"<<std::endl;
@@ -297,11 +244,8 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
         std::cerr << "The storage folder should be in path:" <<path_to_data<< std::endl<<std::endl;
         std::exit(0);
       }
-
       std::vector<std::string> updir_wu;
-
       getParentDir(path_to_data+storage_fol,updir_wu);
-
       for(auto const & m : updir_wu)
       {
         if( boost::filesystem::exists(boost::filesystem::path(path_to_data+storage_fol+'/'+ m+'/'+p.first)) )
@@ -309,13 +253,9 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
           pathToObj=path_to_data+storage_fol+'/'+m+'/'+p.first;
         }
       }
-
-
     }
-
     else if(dataset_input== "BOTH")
     {
-
       std::vector<std::string> split_store_folder;
       boost::split(split_store_folder, storage_fol , boost::is_any_of("/"));
 
@@ -330,43 +270,25 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
         std::exit(0);
       }
 
-
-
       if( boost::filesystem::exists(boost::filesystem::path(path_to_data+split_store_folder[0]+'/'+p.first)) )
       {
         pathToObj=path_to_data+split_store_folder[0]+'/'+p.first;
-
       }
       else
       {
-        std::vector<std::string> updir_wuOne;
-
-        getParentDir(path_to_data+split_store_folder[1] ,updir_wuOne);
-
-        for(auto const & n : updir_wuOne)
-        {
-          if( boost::filesystem::exists(boost::filesystem::path(path_to_data+split_store_folder[1]+'/'+ n+'/'+p.first)) )
+          std::vector<std::string> updir_wuOne;
+          getParentDir(path_to_data + split_store_folder[1], updir_wuOne);
+          for (auto const &n : updir_wuOne)
           {
-            pathToObj=path_to_data+split_store_folder[1]+'/'+n+'/'+p.first;
-
+            if (boost::filesystem::exists(boost::filesystem::path(path_to_data + split_store_folder[1] + '/' + n + '/' + p.first)))
+                  pathToObj = path_to_data + split_store_folder[1] + '/' + n + '/' + p.first;
           }
-
-        }
-
       }
-
-
     }
     else
-    {
       std::cout<<dataset_input<< "is a Wrong dataset_name"<<std::endl;
-    }
-
-
-
 
     std::cout<<"pathToObj:"<<pathToObj<<std::endl;
-
     classdp = opendir(pathToObj.c_str());
 
     if(classdp == NULL)
@@ -377,7 +299,6 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
       std::cerr<<"Wrong combination of storageInput( "<<storage_fol<<" ) and dataset_name ( "<<dataset_input<<" ) parameter is chosen"<<std::endl;
       std::cerr<<"Please check the help menu"<<std::endl;
       continue;
-
     }
 
     while((classdirp = readdir(classdp)) != NULL)
@@ -386,41 +307,29 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
       {
         continue;
       }
-
       std::string filename = classdirp->d_name;
-
       pos = filename.rfind(file_extension.c_str());
       if(pos != std::string::npos)
       {
         modelFiles[p.second].push_back(pathToObj + '/' + filename);
-
       }
-
     }
   }
 
   std::map<double, std::vector<std::string> >::iterator it;
-
   for(it = modelFiles.begin(); it != modelFiles.end(); ++it)
   {
     std::sort(it->second.begin(), it->second.end());
   }
-
 }
 
 
-
-
-// To extract the VFH feature.........................................
-// Taken from rs_addons...............................................
-void extractPCLDescriptors(std::string descriptorType, const std::map<double, std::vector<std::string> > &modelFiles,
+void extractPCLDescriptors(std::string descriptorType,
+                           const std::map<double, std::vector<std::string> > &modelFiles,
                            std::vector<std::pair<double, std::vector<float> > > &extract_features)
 {
 
-
-
   std::string featDescription;
-
   for(std::map<double, std::vector<std::string> >::const_iterator it = modelFiles.begin();
       it != modelFiles.end(); ++it)
   {
@@ -442,12 +351,8 @@ void extractPCLDescriptors(std::string descriptorType, const std::map<double, st
 
       pcl::PointCloud<pcl::VFHSignature308>::Ptr extractedDiscriptor(new pcl::PointCloud<pcl::VFHSignature308> ());
 
-
-
       if (descriptorType=="VFH")
       {
-
-
         std::cout<<"Calculation start with VFH Feature"<<std::endl;
 
         pcl::VFHEstimation<pcl::PointXYZRGBA, pcl::Normal, pcl::VFHSignature308> vfhEstimation;
@@ -459,16 +364,11 @@ void extractPCLDescriptors(std::string descriptorType, const std::map<double, st
         vfhEstimation.compute(*extractedDiscriptor);
 
         featDescription="VFH feature size :";
-
       }
-
-
 
       if(descriptorType=="CVFH")
       {
-
         std::cout<<"Calculation start with CVFH Feature"<<std::endl;
-
         pcl::CVFHEstimation<pcl::PointXYZRGBA, pcl::Normal, pcl::VFHSignature308> cvfhEst;
         cvfhEst.setInputCloud(cloud);
         cvfhEst.setInputNormals(cloud_normals);
@@ -477,7 +377,6 @@ void extractPCLDescriptors(std::string descriptorType, const std::map<double, st
         cvfhEst.setCurvatureThreshold(1.0);
         cvfhEst.setNormalizeBins(true);
         cvfhEst.compute(*extractedDiscriptor);
-
         featDescription="CVFH feature size :";
       }
 
@@ -490,12 +389,12 @@ void extractPCLDescriptors(std::string descriptorType, const std::map<double, st
       extract_features.push_back(std::pair<double, std::vector<float> >(it->first, descriptorVec));
     }
   }
-
   std::cerr << featDescription << extract_features.size() << std::endl;
 }
 
 // To extract the CNN and VGG16 features.........................................
-void extractCaffeFeature(std::string featType, const  std::map<double, std::vector<std::string> > &modelFiles,
+void extractCaffeFeature(std::string featType,
+                         const  std::map<double, std::vector<std::string> > &modelFiles,
                          std::string resourcesPackagePath,
                          std::vector<std::pair<double, std::vector<float> > > &caffe_features)
 {
@@ -523,7 +422,6 @@ void extractCaffeFeature(std::string featType, const  std::map<double, std::vect
 
   std::string CAFFE_MEAN_FILE= "/caffe/data/imagenet_mean.binaryproto";
   std::string CAFFE_LABLE_FILE = "/caffe/data/synset_words.txt";
-
 
   CaffeProxy caffeProxyObj(resourcesPackagePath + CAFFE_MODEL_FILE,
                            resourcesPackagePath + CAFFE_TRAINED_FILE,
@@ -555,7 +453,7 @@ void splitDataset(std::vector<std::pair<double, std::vector<float> > > features,
                   std::vector<std::pair<double, std::vector<float> > > &output_train,
                   std::vector<std::pair<double, std::vector<float> > > &output_test)
 {
-  // The following loop split every fourth desccriptor and store it to vector output_test
+  //every fourth descriptor stored to vector output_test
   for(int i=0; i<features.size()/4;i++)
   {
     for(int j=0; j<3; j++ )
@@ -564,14 +462,13 @@ void splitDataset(std::vector<std::pair<double, std::vector<float> > > features,
     }
     output_test.push_back(features[3+4*i]);
   }
-
 }
 
 // To split the instance dataset into train and and test dataset..............................
 void descriptorsSplit( std::vector<std::pair<double, std::vector<float> > > features,
                        std::vector<std::pair<double, std::vector<float> > > &output)
 {
-  // The following loop split every fourth desccriptor and store it to vector output_test
+  // The following loop split every fourth descriptor and store it to vector output_test
   for(int i=0; i<features.size()/4;i++)
   {
     output.push_back(features[4*i]);
@@ -598,12 +495,9 @@ void saveDatasets (std::vector<std::pair<double, std::vector<float> > > train_da
       descriptors_train.at<float>(i, j) =  train_dataset[i].second[j];
     }
   }
-
-
   for(size_t i = 0; i <  test_dataset.size(); ++i)
   {
     label_test.at<float>(i,0)= test_dataset[i].first;
-
     for(size_t j = 0; j <  test_dataset[i].second.size(); ++j)
     {
       descriptors_test.at<float>(i, j) =  test_dataset[i].second[j];
@@ -612,7 +506,6 @@ void saveDatasets (std::vector<std::pair<double, std::vector<float> > > train_da
 
   //To save file in disk...........................................................
   cv::FileStorage fs;
-
   // To save the train data.................................................
   fs.open(savePathToOutput + dataset_name +'_'+ descriptor_name +'_'+"MatTrain"+'_'+ xml_filename+".yaml", cv::FileStorage::WRITE);
   fs <<dataset_name +'_'+ descriptor_name +'_'+"MatTrain"+'_'+xml_filename << descriptors_train;
@@ -632,23 +525,18 @@ void saveDatasets (std::vector<std::pair<double, std::vector<float> > > train_da
   std::cout<<"extracted feautres should be found in path ("<< savePathToOutput<<")"<<std::endl;
 }
 
-
-
 void saveObjectToLabels( std::vector <std::pair < string, double> > input_file,std::string descriptor_name,
                          std::string dataset_name, std::string xml_filename, std::string savePathToOutput)
 {
   std::ofstream file((savePathToOutput + dataset_name +'_'+ descriptor_name +'_'+"ClassLabel"+'_'+xml_filename+".txt").c_str());
-
   for(auto p: input_file)
   {
     file<<p.first<<":"<<p.second<<endl;
   }
-
   std::cout<<" clasLabel in double should be found in path ("<< savePathToOutput<<")"<<std::endl;
 }
 
 int main(int argc, char **argv)
-
 {
   po::options_description desc("Allowed options");
   std::string split_name,storageInput, feat,dataset_name;
@@ -662,7 +550,6 @@ int main(int argc, char **argv)
        "choose the dataset: [IAI|WU|BOTH]")
       ("feature,f", po::value<std::string>(&feat)->default_value("CNN"),
        "choose feature to extract: [CNN|VGG16|VFH|CVFH]");
-
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
@@ -673,16 +560,10 @@ int main(int argc, char **argv)
     return 1;
   }
 
-
-
   // Define path to get the datasets.......................................................
   std::string resourcePath = ros::package::getPath("rs_resources");
-
   std::string object_file_path ;
-
   object_file_path = resourcePath + "/objects_dataset/splits/" + split_name + ".yaml";
-
-
 
   if(!boost::filesystem::exists(boost::filesystem::path( object_file_path)))
   {
@@ -692,13 +573,9 @@ int main(int argc, char **argv)
     std::cerr << "The file should be in ( rs_resources/objects_datasets/splits/ ) folder "<< std::endl<<std::endl;
     return EXIT_FAILURE;
   }
-
   std::cout << "Path to class label file : " << object_file_path << std::endl<<std::endl;
 
-
-
   //To save file in disk...........................................................
-
   std::string savePathToOutput = resourcePath +"/objects_dataset/extractedFeat/";
 
   // To check the storage folder for generated files by this program ................................................
@@ -711,20 +588,16 @@ int main(int argc, char **argv)
 
   std::cout << "Path to save the extracted feature : " << savePathToOutput << std::endl<< std::endl;
 
-
-  //.................................................................................................
   std::vector <std::pair < string, double> > objectToLabel;
   std::vector <std::pair < string, double> > objectToLabel_train;
   std::vector <std::pair < string, double> > objectToLabel_test;
   std::vector <std::pair < string, double> > objectToClassLabelMap;
-
 
   // To read the class label from .yaml file................
   if(dataset_name == "IAI")
   {
     readClassLabel(object_file_path,objectToLabel, objectToClassLabelMap);
   }
-
   else if(dataset_name == "WU")
   {
     readClassLabelWU(object_file_path,objectToLabel_train ,objectToLabel_test,objectToClassLabelMap);
@@ -733,13 +606,15 @@ int main(int argc, char **argv)
   {
     readClassLabel(object_file_path,objectToLabel,objectToClassLabelMap);
   }
-  else {std::cout<<"Please select your 'dataset_name' parameter as IAI or WU or BOTH"<<std::endl;}
+  else
+  {
+      std::cout<<"Please select your 'dataset_name' parameter as IAI or WU or BOTH"<<std::endl;
+  }
 
   // need to store .pcd  or .png file from storage
   std::map< double, std::vector<std::string> > model_files_all;
   std::map< double, std::vector<std::string> > model_files_train;
   std::map< double, std::vector<std::string> > model_files_test;
-
 
   //Extract the feat descriptors
   std::vector<std::pair<double, std::vector<float> > > descriptors_all;
@@ -754,11 +629,8 @@ int main(int argc, char **argv)
   std::vector<std::pair<double, std::vector<float> > > descriptors_train_split;
   std::vector<std::pair<double, std::vector<float> > > descriptors_test_split;
 
-
-
   if(dataset_name=="IAI")
   {
-
     if(feat == "CNN")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
@@ -772,30 +644,24 @@ int main(int argc, char **argv)
     else if(feat == "VGG16")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read all .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel, model_files_all, "_crop.png",dataset_name);
-
       // To calculate VFH descriptors..................................
       extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
     }
     else if(feat == "VFH")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read all .cpd files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel, model_files_all, ".pcd",dataset_name);
-
       // To calculate VFH descriptors..................................
       extractPCLDescriptors(feat,model_files_all, descriptors_all);
     }
     else if(feat == "CVFH")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read all .cpd files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel, model_files_all, ".pcd",dataset_name);
-
       // To calculate VFH descriptors..................................
       extractPCLDescriptors(feat,model_files_all, descriptors_all);
     }
@@ -804,85 +670,60 @@ int main(int argc, char **argv)
       std::cerr<<"Please select feature (CNN , VGG16, VFH, CVFH)"<<std::endl;
       return EXIT_FAILURE;
     }
-
     // To split all the calculated VFH descriptors (descriptors_all) into train and test data for
     // the classifier. Here evey fourth element of vector (descriptors_all) is considered as test data
     // and rest are train data
     splitDataset(descriptors_all, descriptors_all_train, descriptors_all_test);
-
     // To save the train and test data in path /rs_resources/objects_dataset/extractedFeat
     saveDatasets (descriptors_all_train, descriptors_all_test, feat,dataset_name,split_name,savePathToOutput);
-
   }
-
   else if(dataset_name=="WU")
   {
     if( feat == "CNN")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel_train, model_files_train, "_crop.png",dataset_name);
-
-
       // To read .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel_test, model_files_test, "_crop.png",dataset_name);
-
       // To calculate CNN features..................................
       extractCaffeFeature(feat ,model_files_train, resourcePath, descriptors_train);
-
       // To calculate CNN features..................................
       extractCaffeFeature(feat, model_files_test, resourcePath, descriptors_test);
-
     }
     else if( feat == "VGG16")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel_train, model_files_train, "_crop.png",dataset_name);
-
       // To read .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel_test, model_files_test, "_crop.png",dataset_name);
-
-
       // To calculate CNN features..................................
       extractCaffeFeature(feat ,model_files_train, resourcePath, descriptors_train);
-
       // To calculate CNN features..................................
       extractCaffeFeature(feat, model_files_test, resourcePath, descriptors_test);
-
     }
     else if(feat == "VFH" )
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel_train, model_files_train, ".pcd",dataset_name);
-
       // To read .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel_test, model_files_test, ".pcd",dataset_name);
-
       // To calculate CNN features..................................
       extractPCLDescriptors(feat,model_files_train, descriptors_train);
-
       // To calculate CNN features..................................
       extractPCLDescriptors(feat ,model_files_test, descriptors_test);
-
     }
     else if(feat == "CVFH")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel_train, model_files_train, ".pcd",dataset_name);
-
       // To read .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel_test, model_files_test, ".pcd",dataset_name);
-
       // To calculate CNN features..................................
       extractPCLDescriptors(feat, model_files_train, descriptors_train);
-
       // To calculate CNN features..................................
       extractPCLDescriptors(feat, model_files_test, descriptors_test);
     }
@@ -891,55 +732,42 @@ int main(int argc, char **argv)
       std::cerr<<"Please select feature (CNN , VGG16, VFH, CVFH)"<<std::endl;
       return EXIT_FAILURE;
     }
-
-
     //to take every fourth elements...........................
     descriptorsSplit(descriptors_train,descriptors_train_split);
     descriptorsSplit(descriptors_test,descriptors_test_split);
     saveDatasets (descriptors_train_split, descriptors_test_split, feat,dataset_name,split_name,savePathToOutput);
   }
-
   else if(dataset_name=="BOTH")
   {
-
     if(feat == "CNN")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read all .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel, model_files_all, "_crop.png",dataset_name);
-
       // To calculate VFH descriptors..................................
       extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
-
     }
     else if(feat == "VGG16")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read all .png files from the storage folder...........
       getFiles(resourcePath,storageInput, objectToLabel, model_files_all, "_crop.png",dataset_name);
-
       // To calculate VFH descriptors..................................
       extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
     }
     else if(feat == "VFH")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read all .cpd files from the storage folder...........
       getFiles(resourcePath,storageInput,objectToLabel, model_files_all, ".pcd",dataset_name);
-
       // To calculate VFH descriptors..................................
       extractPCLDescriptors(feat,model_files_all, descriptors_all);
     }
     else if(feat == "CVFH")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-
       // To read all .cpd files from the storage folder...........
       getFiles(resourcePath, storageInput , objectToLabel, model_files_all, ".pcd",dataset_name);
-
       // To calculate VFH descriptors..................................
       extractPCLDescriptors(feat,model_files_all, descriptors_all);
     }
@@ -953,21 +781,16 @@ int main(int argc, char **argv)
     // the classifier. Here evey fourth element of vector (descriptors_all) is considered as test data
     // and rest are train data
     splitDataset(descriptors_all, descriptors_all_train, descriptors_all_test);
-
     // To save the train and test data in path /rs_resources/objects_dataset/extractedFeat/
     saveDatasets (descriptors_all_train, descriptors_all_test, feat,dataset_name,split_name,savePathToOutput);
   }
-
   else
   {
     std::cerr<<"Please select dataset (IAI or WU or BOTH)"<<std::endl;
     return EXIT_FAILURE;
   }
-
   //To save the string class labels in type double in folder rs_resources/objects_dataset/extractedFeat
   saveObjectToLabels(objectToClassLabelMap,feat,dataset_name, split_name,savePathToOutput);
-
   std::cout<<"Descriptors calculation is done"<<std::endl;
-
   return 0;
 }  
