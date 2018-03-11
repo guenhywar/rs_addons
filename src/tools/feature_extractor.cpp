@@ -38,7 +38,7 @@
 using namespace cv;
 using namespace std;
 namespace po = boost::program_options;
-
+namespace bfs = boost::filesystem;
 
 //To read the split file for both the IAI dataset and BOTH datasets from rs_resource/object_datasets/splits folder
 void readClassLabel( std::string obj_file_path,
@@ -212,10 +212,15 @@ void getParentDir(std::string path_storage , std::vector<std::string>& updir_wu_
 }
 
 //To read all the objects from rs_resources/objects_dataset folder.....................
-void getFiles(const std::string &resourchPath, std::string storage_fol, std::vector <std::pair < string, double> > object_label,
-              std::map<double, std::vector<std::string> > &modelFiles, std::string file_extension, std::string dataset_input)
+void getFiles(const std::string &resourchPath, 
+              std::string storage_fol,
+              std::vector <std::pair < string, double> > object_label,
+              std::map<double, std::vector<std::string> > &modelFiles, 
+              std::string file_extension, std::string dataset_input)
 {    
-  std::string path_to_data =resourchPath+"/objects_dataset/";
+  std::string path_to_data =resourchPath+"/objects_dataset/object_data/";
+  std::cerr<<"______________________"<<std::endl;
+  std::cerr<<path_to_data<<std::endl;
   DIR *classdp;
   struct dirent *classdirp;
   size_t pos;
@@ -224,11 +229,11 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
     std::string pathToObj;
     if(dataset_input=="IAI")
     {
-      if( !boost::filesystem::exists(boost::filesystem::path(path_to_data+storage_fol)) )
+      if( !bfs::exists(bfs::path(path_to_data+storage_fol)) )
       {
         std::cout<<"*********************************************************************************************"<<std::endl;
         std::cerr<<"Input images storage folder for " <<dataset_input<<" "<<"dataset does not exist " <<std::endl;
-        std::cerr<<"You have selected storage folder(" <<storage_fol<< "), which does not exist " <<std::endl;
+        std::cerr<<"You have selected storage folder (" <<storage_fol<< "), which does not exist " <<std::endl;
         std::cerr << "The storage folder should be in path:" <<path_to_data<< std::endl<<std::endl;
         std::exit(0);
       }
@@ -236,7 +241,7 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
     }
     else if(dataset_input== "WU")
     {
-      if( !boost::filesystem::exists(boost::filesystem::path(path_to_data+storage_fol)) )
+      if( !bfs::exists(bfs::path(path_to_data+storage_fol)) )
       {
         std::cout<<"*********************************************************************************************"<<std::endl;
         std::cerr<<"Input images storage folder for " <<dataset_input<<" "<<"dataset does not exist " <<std::endl;
@@ -248,7 +253,7 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
       getParentDir(path_to_data+storage_fol,updir_wu);
       for(auto const & m : updir_wu)
       {
-        if( boost::filesystem::exists(boost::filesystem::path(path_to_data+storage_fol+'/'+ m+'/'+p.first)) )
+        if( bfs::exists(bfs::path(path_to_data+storage_fol+'/'+ m+'/'+p.first)) )
         {
           pathToObj=path_to_data+storage_fol+'/'+m+'/'+p.first;
         }
@@ -259,8 +264,8 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
       std::vector<std::string> split_store_folder;
       boost::split(split_store_folder, storage_fol , boost::is_any_of("/"));
 
-      if( !boost::filesystem::exists(boost::filesystem::path(path_to_data+split_store_folder[0])) ||
-          !boost::filesystem::exists(boost::filesystem::path(path_to_data+split_store_folder[1])))
+      if( !bfs::exists(bfs::path(path_to_data+split_store_folder[0])) ||
+          !bfs::exists(bfs::path(path_to_data+split_store_folder[1])))
       {
         std::cout<<"*********************************************************************************************"<<std::endl;
         std::cerr<<"Input images storage folders "<<storage_fol<<" "<<"for"<<dataset_input<<" "<<"datasets do not exist" <<std::endl;
@@ -270,7 +275,7 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
         std::exit(0);
       }
 
-      if( boost::filesystem::exists(boost::filesystem::path(path_to_data+split_store_folder[0]+'/'+p.first)) )
+      if( bfs::exists(bfs::path(path_to_data+split_store_folder[0]+'/'+p.first)) )
       {
         pathToObj=path_to_data+split_store_folder[0]+'/'+p.first;
       }
@@ -280,7 +285,7 @@ void getFiles(const std::string &resourchPath, std::string storage_fol, std::vec
           getParentDir(path_to_data + split_store_folder[1], updir_wuOne);
           for (auto const &n : updir_wuOne)
           {
-            if (boost::filesystem::exists(boost::filesystem::path(path_to_data + split_store_folder[1] + '/' + n + '/' + p.first)))
+            if (bfs::exists(bfs::path(path_to_data + split_store_folder[1] + '/' + n + '/' + p.first)))
                   pathToObj = path_to_data + split_store_folder[1] + '/' + n + '/' + p.first;
           }
       }
@@ -562,24 +567,24 @@ int main(int argc, char **argv)
 
   // Define path to get the datasets.......................................................
   std::string resourcePath = ros::package::getPath("rs_resources");
-  std::string object_file_path ;
-  object_file_path = resourcePath + "/objects_dataset/splits/" + split_name + ".yaml";
+  std::string split_file_path ;
+  split_file_path = resourcePath + "/objects_dataset/splits/" + split_name + ".yaml";
 
-  if(!boost::filesystem::exists(boost::filesystem::path( object_file_path)))
+  if(!bfs::exists(bfs::path( split_file_path)))
   {
     std::cout<<"*********************************************************************************************"<<std::endl;
-    std::cerr<<" Class label file (.yaml) is not found. Please check the path below  :"<<std::endl;
-    std::cerr << "Path to class label file : " << object_file_path << std::endl<<std::endl;
+    std::cerr<<" Split file (.yaml) is not found. Please check the path below  :"<<std::endl;
+    std::cerr << "Path to class label file : " << split_file_path << std::endl<<std::endl;
     std::cerr << "The file should be in ( rs_resources/objects_datasets/splits/ ) folder "<< std::endl<<std::endl;
     return EXIT_FAILURE;
   }
-  std::cout << "Path to class label file : " << object_file_path << std::endl<<std::endl;
+  std::cout << "Path to split file : " << split_file_path << std::endl;
 
   //To save file in disk...........................................................
   std::string savePathToOutput = resourcePath +"/objects_dataset/extractedFeat/";
 
   // To check the storage folder for generated files by this program ................................................
-  if(!boost::filesystem::exists(savePathToOutput))
+  if(!bfs::exists(savePathToOutput))
   {
     std::cerr<<"Folder called (extractedFeat) not found to save the extracted feature generated by this code."<<std::endl;
     std::cerr<<"Please create the folder in rs_resource/objects_dataset/ and name it as extractedFeat "<<std::endl;
@@ -596,15 +601,15 @@ int main(int argc, char **argv)
   // To read the class label from .yaml file................
   if(dataset_name == "IAI")
   {
-    readClassLabel(object_file_path,objectToLabel, objectToClassLabelMap);
+    readClassLabel(split_file_path,objectToLabel, objectToClassLabelMap);
   }
   else if(dataset_name == "WU")
   {
-    readClassLabelWU(object_file_path,objectToLabel_train ,objectToLabel_test,objectToClassLabelMap);
+    readClassLabelWU(split_file_path,objectToLabel_train ,objectToLabel_test,objectToClassLabelMap);
   }
   else if(dataset_name == "BOTH")
   {
-    readClassLabel(object_file_path,objectToLabel,objectToClassLabelMap);
+    readClassLabel(split_file_path,objectToLabel,objectToClassLabelMap);
   }
   else
   {
@@ -679,7 +684,7 @@ int main(int argc, char **argv)
   }
   else if(dataset_name=="WU")
   {
-    if( feat == "CNN")
+    if( feat == "CNN" ||  feat == "VGG16")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
       // To read .png files from the storage folder...........
@@ -691,19 +696,7 @@ int main(int argc, char **argv)
       // To calculate CNN features..................................
       extractCaffeFeature(feat, model_files_test, resourcePath, descriptors_test);
     }
-    else if( feat == "VGG16")
-    {
-      std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-      // To read .png files from the storage folder...........
-      getFiles(resourcePath,storageInput, objectToLabel_train, model_files_train, "_crop.png",dataset_name);
-      // To read .png files from the storage folder...........
-      getFiles(resourcePath,storageInput, objectToLabel_test, model_files_test, "_crop.png",dataset_name);
-      // To calculate CNN features..................................
-      extractCaffeFeature(feat ,model_files_train, resourcePath, descriptors_train);
-      // To calculate CNN features..................................
-      extractCaffeFeature(feat, model_files_test, resourcePath, descriptors_test);
-    }
-    else if(feat == "VFH" )
+    else if(feat == "VFH" || feat == "CVFH")
     {
       std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
       // To read .png files from the storage folder...........
@@ -715,23 +708,12 @@ int main(int argc, char **argv)
       // To calculate CNN features..................................
       extractPCLDescriptors(feat ,model_files_test, descriptors_test);
     }
-    else if(feat == "CVFH")
-    {
-      std::cout<<"Calculation starts with :" <<dataset_name<<"::"<<feat<<std::endl;
-      // To read .png files from the storage folder...........
-      getFiles(resourcePath,storageInput, objectToLabel_train, model_files_train, ".pcd",dataset_name);
-      // To read .png files from the storage folder...........
-      getFiles(resourcePath,storageInput, objectToLabel_test, model_files_test, ".pcd",dataset_name);
-      // To calculate CNN features..................................
-      extractPCLDescriptors(feat, model_files_train, descriptors_train);
-      // To calculate CNN features..................................
-      extractPCLDescriptors(feat, model_files_test, descriptors_test);
-    }
     else
     {
       std::cerr<<"Please select feature (CNN , VGG16, VFH, CVFH)"<<std::endl;
       return EXIT_FAILURE;
     }
+
     //to take every fourth elements...........................
     descriptorsSplit(descriptors_train,descriptors_train_split);
     descriptorsSplit(descriptors_test,descriptors_test_split);
