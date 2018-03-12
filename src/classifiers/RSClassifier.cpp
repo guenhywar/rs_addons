@@ -249,6 +249,8 @@ void  RSClassifier::processCaffeFeature(std::string memory_name, std::string set
     std::vector<rs::Features> features;
     cluster.annotations.filter(features);
 
+    outInfo("feature size:" << features.size());
+
     for(size_t j = 0; j < features.size(); ++j)
     {
       rs::Features &feats = features[j];

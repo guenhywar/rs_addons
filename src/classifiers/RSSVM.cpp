@@ -65,6 +65,19 @@ void RSSVM::trainModel(std::string train_matrix_name, std::string train_label_na
 
 #elif CV_MAJOR_VERSION == 3
 
+    cv::Mat var_type = cv::Mat(train_matrix.cols +1, 1, CV_8U);
+    var_type.setTo(cv::Scalar(cv::ml::VAR_NUMERICAL));
+    var_type.at<uchar>(train_matrix.cols, 0) = cv::ml::VAR_CATEGORICAL;
+
+    cv::Ptr<cv::ml::TrainData> trainData = cv::ml::TrainData::create(train_matrix,  //samples
+                                                                 cv::ml::ROW_SAMPLE, //layout
+                                                                 train_label, //responses
+                                                                 cv::noArray(), //varIdx
+                                                                 cv::noArray(), //sampleIdx
+                                                                 cv::noArray(), //sampleWeights
+                                                                 var_type //varType
+                                                                 );
+
     cv::Ptr<cv::ml::SVM> my_svm = cv::ml::SVM::create();
 
     my_svm->setType(cv::ml::SVM::Types::C_SVC);
@@ -78,8 +91,7 @@ void RSSVM::trainModel(std::string train_matrix_name, std::string train_label_na
     my_svm->setClassWeights(cv::Mat());
     my_svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 1000, 0.000001));
 
-    //TODO: ROW_SAMPLE? Nothing about it in above
-    my_svm->train(train_matrix, cv::ml::ROW_SAMPLE, train_label);
+    my_svm->train(trainData);
 
 #endif
 

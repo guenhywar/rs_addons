@@ -72,7 +72,7 @@ void RSRF:: trainModel(std::string train_matrix_name, std::string train_label_na
 #elif CV_MAJOR_VERSION == 3
 
     cv::Mat var_type = cv::Mat(train_matrix.cols +1, 1, CV_8U);
-    var_type.setTo(Scalar(cv::ml::VAR_NUMERICAL));
+    var_type.setTo(cv::Scalar(cv::ml::VAR_NUMERICAL));
     var_type.at<uchar>(train_matrix.cols, 0) = cv::ml::VAR_CATEGORICAL;
 
     cv::Ptr<cv::ml::TrainData> trainData = cv::ml::TrainData::create(train_matrix,  //samples
