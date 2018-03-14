@@ -165,7 +165,7 @@ void RSRF::classify(std::string trained_file_name_saved, std::string test_matrix
 //  int sizeOfTree=ntrees;
 //  std::cout<<numberOfCls<<sizeOfTree;
 #elif CV_MAJOR_VERSION == 3
-  cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::loadFromString<cv::ml::RTrees>((loadTrained(trained_file_name_saved)).c_str());
+  cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::load<cv::ml::RTrees>(cv::String(loadTrained(trained_file_name_saved)));
 #endif
 
   //convert test label matrix into a vector
@@ -182,7 +182,7 @@ void RSRF::classify(std::string trained_file_name_saved, std::string test_matrix
 #if CV_MAJOR_VERSION == 2
       double res = rtree->predict(test_matrix.row(i), cv::Mat());
 #elif CV_MAJOR_VERSION == 3
-      double res = rtree->predict(test_matrix.row(i), cv::Mat());
+      double res = rtree->predict(test_matrix.row(i));
 #endif
       int prediction = res;
 
@@ -214,8 +214,9 @@ void RSRF::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_
      rtree.load((loadTrained(trained_file_name_saved)).c_str());
      double res = rtree.predict(test_mat, cv::Mat());
 #elif CV_MAJOR_VERSION == 3
-     cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::loadFromString<cv::ml::RTrees>((loadTrained(trained_file_name_saved)).c_str());
-     double res = rtree->predict(test_mat, cv::Mat());
+     cv::Ptr<cv::ml::RTrees> rtree = cv::Algorithm::load<cv::ml::RTrees>(cv::String(loadTrained(trained_file_name_saved)));
+
+     double res = rtree->predict(test_mat);
 #endif
 
      int class_index=res-1;

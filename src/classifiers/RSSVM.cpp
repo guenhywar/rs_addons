@@ -113,17 +113,16 @@ void RSSVM::classify (std::string trained_file_name_saved,
 
 #if CV_MAJOR_VERSION == 2
   CvSVM* your_svm=new CvSVM;
-#elif CV_MAJOR_VERSION == 3
-  cv::Ptr<cv::ml::SVM> your_svm = cv::ml::SVM::create();
-#endif
-
-  //To load the trained model..............................
+  //To load the trained model
   your_svm->load((loadTrained(trained_file_name_saved)).c_str());
 
-  //To count the support vector................................
-#if CV_MAJOR_VERSION == 2
+  //To count the support vector
   int in= your_svm->get_support_vector_count();
 #elif CV_MAJOR_VERSION == 3
+  //load the trained model
+  cv::Ptr<cv::ml::SVM> your_svm = cv::Algorithm::load<cv::ml::SVM>(cv::String(loadTrained(trained_file_name_saved)));
+
+  //To count the support vector
   int in = your_svm->getSupportVectors().rows;
 #endif
   std::cout<<"The number of support vector:"<<in<<std::endl;
@@ -158,19 +157,19 @@ void RSSVM::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test
 
 #if CV_MAJOR_VERSION == 2
   CvSVM* your_svm=new CvSVM;
-#elif CV_MAJOR_VERSION == 3
-  cv::Ptr<cv::ml::SVM> your_svm = cv::ml::SVM::create();
-#endif
-
-  //To load the trained model..............................
+  //To load the trained model
   your_svm->load((loadTrained(trained_file_name_saved)).c_str());
 
-  //To count the support vector................................
-#if CV_MAJOR_VERSION == 2
+  //To count the support vector
   int in= your_svm->get_support_vector_count();
 #elif CV_MAJOR_VERSION == 3
+  //load the trained model
+  cv::Ptr<cv::ml::SVM> your_svm = cv::Algorithm::load<cv::ml::SVM>(cv::String(loadTrained(trained_file_name_saved)));
+
+  //To count the support vector
   int in = your_svm->getSupportVectors().rows;
 #endif
+
   std::cout<<"The number of support vector:"<<in<<std::endl;
   double res = your_svm->predict(test_mat);
   det =res;

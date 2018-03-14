@@ -108,7 +108,7 @@ void RSKNN:: classifyKNN(std::string train_matrix_name,std::string train_label_n
     // double res = knncls->find_nearest(test_matrix.row(i), k,bestResponse,neighborResponses,distances);
     double res = knncalld->find_nearest(test_matrix.row(i),k_max);
 #elif CV_MAJOR_VERSION == 3
-    //TODO: is it okay to use empty array? isn't used. per documentation all output is optional, still have to give one
+
     double res = knncalld->findNearest(test_matrix.row(i), k_max, cv::noArray());
 #endif
 
@@ -162,7 +162,6 @@ void RSKNN::classifyOnLiveDataKNN(std::string train_matrix_name, std::string tra
 
   int k_max = knncalldc->getDefaultK();
 
-  //TODO: is it okay to use empty array? isn't used. per documentation all output is optional, still have to give one
   double res = knncalldc->findNearest(test_mat, k_max, cv::noArray());
   std::cout << "prediction class is :" << res << std::endl;
   det = res;
