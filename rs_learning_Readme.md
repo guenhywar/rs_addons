@@ -21,7 +21,7 @@
                             label. The file should be in catkin workspace rs_resources/objects_dataset/splits folder.
             
                    storage: It is the name of input image storage folder.The folder should be in 
-                            rs_resources/objects_dataset. For this project we use two datasets, 
+                            rs_resources/objects_dataset/object_data. For this project we use two datasets,
                             one is  kitchen environmemts dataset from Institue for atificial inteligent 
                             and the other one is from Washington University dataset. Parameter's (storage) value 
                             should be iaiImageFolder/wuImageFolder if someone wants to use both datasets at once
@@ -155,5 +155,61 @@
                    from Robosherlock annotators pipeline (Ex. PCLfeatureExtractor or caffe ) must be the 
                    same as the respective trainedModel's features.
  
+
+
+## Opencv_3_migration
+
+    ### FeatureExtractor
+
+        Extracts CNN, VGG16, VFH or CVFH features from input data and stores them.
+
+        rosrun rs_addons featureExtractor -s ... -i ... -d ... -f ...
+
+            -help, -h :
+                help messages.
+
+            -split, -s :
+                split file name (.yaml) with information about objects and their class labels
+                found in rs_resources/objects_dataset/splits
+
+            -storageInput, -i :
+                input storage folder name found in rs_resources/objects_dataset/object_data.
+                If want to use both storages at once provide folders name as iaiStorageFolder/wuStorageFolder
+
+            -datasets, -d :
+                dataset name [IAI|WU|BOTH]
+
+            -feature, -f :
+                feature type to extract [CNN|VGG16|VFH|CVFH]
+
+
+            The above command should generate the following files in rs_resources/objects_dataset/extractedFeat folder. If extractedFeat folder does not exist, create it.
+
+                      1. datasets_feature_ClassLabel_split.txt
+
+                      2. datasets_feature_MatTrain_split.yaml
+
+                      3. datasets_feature_MatTrainLabel_split.yaml
+
+                      4. datasets_feature_MatTest_split.yaml
+
+                      5. datasets_feature_MatTestLabel_split.yaml
+
+    ### train_classifier
+
+        rosrun rs_addons train_classifier -c ... -i ... -l ... -o ...
+
+            -help, -h
+
+            -classifier, -c :
+                the classifier to train [SVM|RF|GBT|KNN]
+
+            -input, -i :
+                the input file (datasets_feature_MatTrain_split) with extracted features found in rs_resources/objects_dataset/extractedFeat
  
- 
+            -labels, -l :
+                the label file (datasets_feature_MatTrainLabel_split) found in rs_resources/objects_dataset/extractedFeat
+
+            -output, -o :
+                the name of the output file that will be generated in rs_addons/trainedData.
+                example: datasets_feature_classifierModel_split

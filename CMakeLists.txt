@@ -146,6 +146,13 @@ target_link_libraries(rs_gbAnnotator rs_classifiers
     ${OpenCV_LIBRARIES}
     )
 
+rs_add_library(rs_unrealGTAnnotator src/UnrealGTAnnotator.cpp)
+target_link_libraries(rs_unrealGTAnnotator
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    )
+
+
 # this needs to be renamed...if this is just for running test
 # data trhough the system it can an executable
 rs_add_library(rs_classifyOfflineAnnotator src/ClassifyOfflineAnnotator.cpp)
