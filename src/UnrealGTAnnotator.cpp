@@ -164,8 +164,7 @@ public:
 
       for(auto s : posObjects)
       {
-        //TODO take the second away, only for dummys, who can't write Unreal names  correct
-        if(split[1] == s || split[0] == s)
+        if(split[1] == s)
         {
           rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
           rs::Classification classification = rs::create<rs::Classification>(tcas);
