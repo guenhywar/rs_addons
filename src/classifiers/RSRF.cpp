@@ -241,6 +241,13 @@ void RSRF::RsAnnotation(uima::CAS &tcas, std::string class_name, std::string fea
     classResult.classifier("Random Forest");
     classResult.featurename(feature_name);
     classResult.model(database_name);
+    if(feature_name == "CNN")
+    {
+      classResult.classification_type("CLASS");
+    } else if(feature_name == "VFH")
+    {
+      classResult.classification_type("SHAPE");
+    }
 
     if(set_mode == "CL")
     {

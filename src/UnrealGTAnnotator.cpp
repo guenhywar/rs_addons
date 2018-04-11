@@ -34,6 +34,51 @@ private:
   cv::Mat color, objects, disp;
   std::map<std::string, cv::Vec3b> objectMap;
 
+  std::string posObjects [42] = {
+    "AlbiHimbeerJuice",
+    "BlueCeramicIkeaMug",
+    "BlueMetalPlateWhiteSpeckles",
+    "BluePlasticBowl",
+    "BluePlasticFork",
+    "BluePlasticKnife",
+    "BluePlasticSpoon",
+    "CupEcoOrange",
+    "EdekaRedBowl",
+    "ElBrygCoffee",
+    "JaMilch",
+    "JodSalz",
+    "KelloggsCornFlakes",
+    "KelloggsToppasMini",
+    "KnusperSchokoKeks",
+    "KoellnMuesliKnusperHonigNuss",
+    "LargeGreySpoon",
+    "LinuxCup",
+    "LionCerealBox",
+    "MarkenSalz",
+    "MeerSalz",
+    "NesquikCereal",
+    "PfannerGruneIcetea",
+    "PfannerPfirsichIcetea",
+    "RedMetalBowlWhiteSpeckles",
+    "RedMetalCupWhiteSpeckles",
+    "RedMetalPlateWhiteSpeckles",
+    "RedPlasticFork",
+    "RedPlasticKnife",
+    "RedPlasticSpoon",
+    "ReineButterMilch",
+    "SeverinPancakeMaker",
+    "SiggBottle",
+    "SlottedSpatula",
+    "SojaMilch",
+    "SpitzenReis",
+    "TomatoAlGustoBasilikum",
+    "TomatoSauceOroDiParma",
+    "VollMilch",
+    "WeideMilchSmall",
+    "WhiteCeramicIkeaBowl",
+    "YellowCeramicPlate"
+  };
+
 public:
 
   UnrealGTAnnotator() : DrawingAnnotator(__func__) {}
@@ -62,6 +107,8 @@ public:
     cas.get(VIEW_OBJECT_MAP, objectMap);
 
     disp = color.clone();
+
+    std::vector<rs::Identifiable> cleanedClusters;
 
     std::vector<rs::Cluster> clusters;
     scene.identifiables.filter(clusters);
@@ -111,22 +158,34 @@ public:
         }
       }
 
-      // because name is like: SM_ObjectName_21
+      // because name is normally like: SM_ObjectName_21
       std::vector<std::string> split;
       boost::split(split, mostColor->first, boost::is_any_of("_"));
 
-      rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
-      rs::Classification classification = rs::create<rs::Classification>(tcas);
-      classification.classification_type.set("ground_truth");
-      classification.classname.set(split[1]);
-      classification.classifier.set("UnrealEngine");
-      classification.source.set("UnrealGTAnnotator");
-      gt.classificationGT.set(classification);
-      cluster.annotations.append(gt);
+      for(auto s : posObjects)
+      {
+        //TODO take the second away, only for dummys, who can't write Unreal names  correct
+        if(split[1] == s || split[0] == s)
+        {
+          rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
+          rs::Classification classification = rs::create<rs::Classification>(tcas);
+          classification.classification_type.set("ground_truth");
+          classification.classname.set(split[1]);
+          classification.classifier.set("UnrealEngine");
+          classification.source.set("UnrealGTAnnotator");
+          gt.classificationGT.set(classification);
+          cluster.annotations.append(gt);
 
-      drawResults(roi, split[1]);
+          cleanedClusters.push_back(cluster);
 
+          drawResults(roi, split[1]);
+          break;
+        }
+      }
     }
+
+    scene.identifiables.set(cleanedClusters);
+
     return UIMA_ERR_NONE;
   }
 

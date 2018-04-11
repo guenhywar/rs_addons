@@ -4,7 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 #include <map>
 #include <yaml-cpp/yaml.h>
 #include <ros/package.h>
@@ -183,6 +183,13 @@ void RSSVM::RsAnnotation (uima::CAS &tcas, std::string class_name, std::string f
   classResult.classifier("Support Vector Machine");
   classResult.featurename(feature_name);
   classResult.model(database_name);
+  if(feature_name == "CNN")
+  {
+    classResult.classification_type("CLASS");
+  } else if(feature_name == "VFH")
+  {
+    classResult.classification_type("SHAPE");
+  }
 
   if(set_mode == "CL")
   {
