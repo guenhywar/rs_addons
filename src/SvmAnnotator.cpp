@@ -4,6 +4,9 @@
 #include <iostream>
 #include <vector>
 #include <pcl/point_types.h>
+#include <rs/types/all_types.h>
+#include <rs/scene_cas.h>
+#include <rs/utils/time.h>
 
 #if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
@@ -18,13 +21,9 @@
 #endif
 
 #include <ros/package.h>
-
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/DrawingAnnotator.h>
-
+#include <boost/filesystem.hpp>
 #include <rs_addons/classifiers/RSSVM.h>
+#include <rs/DrawingAnnotator.h>
 
 using namespace uima;
 
@@ -62,7 +61,6 @@ public:
 #if CV_MAJOR_VERSION == 2
   RSClassifier* svmObject= new RSSVM;
 #elif CV_MAJOR_VERSION == 3
-   //TODO:
   RSClassifier* svmObject = new RSSVM;
 #endif
 

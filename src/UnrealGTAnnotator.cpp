@@ -158,18 +158,14 @@ public:
         }
       }
 
-      // because name is normally like: SM_ObjectName_21
-      std::vector<std::string> split;
-      boost::split(split, mostColor->first, boost::is_any_of("_"));
-
-      for(auto s : posObjects)
+      for(auto object : posObjects)
       {
-        if(split[1] == s)
+        if(!mostColor->first.empty() && mostColor->first.find(object) != std::string::npos)
         {
           rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
           rs::Classification classification = rs::create<rs::Classification>(tcas);
           classification.classification_type.set("ground_truth");
-          classification.classname.set(split[1]);
+          classification.classname.set(object);
           classification.classifier.set("UnrealEngine");
           classification.source.set("UnrealGTAnnotator");
           gt.classificationGT.set(classification);
@@ -177,7 +173,7 @@ public:
 
           cleanedClusters.push_back(cluster);
 
-          drawResults(roi, split[1]);
+          drawResults(roi, object);
           break;
         }
       }

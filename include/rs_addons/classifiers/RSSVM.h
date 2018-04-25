@@ -5,8 +5,10 @@
 
 #include <iostream>
 #include <string>
-#include <ros/package.h>
+
 #include <uima/api.hpp>
+
+#include <ros/package.h>
 
 #if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>

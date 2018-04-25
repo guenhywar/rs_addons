@@ -163,6 +163,7 @@
         <name>camera_config_files</name>
         <value>
           <array>
+<!--            <string>config_mongodb_playback.ini</string>-->
             <string>config_unreal_vision.ini</string>
           </array>
         </value>
@@ -175,20 +176,19 @@
         <node>PointCloudFilter</node>
         <node>NormalEstimator</node>
         <node>PlaneAnnotator</node>
-        <!--<node>ImageSegmentationAnnotator</node>-->
         <node>PointCloudClusterExtractor</node>
-        <node>ClusterMerger</node>
+<!--        <node>ClusterMerger</node>-->
+        <node>UnrealGTAnnotator</node>
         <node>Cluster3DGeometryAnnotator</node>
         <node>PrimitiveShapeAnnotator</node>
         <node>ClusterColorHistogramCalculator</node>
         <node>GogglesAnnotator</node>
-<!--       <node>PCLFeatureExtractor</node>-->
-<!--        <node>CaffeAnnotator</node>
-        <node>RfAnnotator</node>-->
+        <node>CaffeAnnotator</node>
+        <node>KnnAnnotator</node>   <!--CNN Features -->
+        <node>PCLFeatureExtractor</node>
+        <node>RfAnnotator</node>    <!--VFH Features -->
 <!--        <node>SVMAnnotator</node>-->
 <!--        <node>ResultAdvertiser</node>-->
-        <node>UnrealGTAnnotator</node>
-<!--        <node>ClusterMerger</node>-->
 <!--        <node>MLNInferencer</node>-->
       </fixedFlow>
     </flowConstraints>
