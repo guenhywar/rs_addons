@@ -36,6 +36,7 @@ private:
   //To work with knn classifier........
   std::string trainData_matrix;
   std::string trainLabel_matrix;
+  int default_k;
 
 public:
 
@@ -86,9 +87,12 @@ public:
       ctx.extractValue("trainLabel_matrix", trainLabel_matrix);
       outInfo("trainLabel_matrix:"<< trainLabel_matrix<<std::endl);
 
+      ctx.extractValue("default_k", default_k);
+      outInfo("value of k-neighbours: " << default_k <<std::endl);
+
       RSKNN* knnObject= new RSKNN;
       outInfo("Classify with RSKNN is going on .......");
-      knnObject->classifyKNN(trainData_matrix ,trainLabel_matrix,test_data_name ,test_label_name,actual_class_label);
+      knnObject->classifyKNN(trainData_matrix ,trainLabel_matrix,test_data_name ,test_label_name,actual_class_label, default_k);
     }
     else
     {
