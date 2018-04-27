@@ -149,18 +149,33 @@ public:
         }
       }
 
-      std::map<std::string, int>::iterator mostColor = colorCount.begin();
-      for(std::map<std::string, int>::iterator it = colorCount.begin(); it != colorCount.end(); ++it)
-      {
-        if(it->second > mostColor->second)
-        {
-          mostColor = it;
-        }
-      }
-
       for(auto object : posObjects)
       {
-        if(!mostColor->first.empty() && mostColor->first.find(object) != std::string::npos)
+        bool objectIsGT = false;
+        std::map<std::string, int> colorMap = colorCount;
+
+        // check for the object with the most pixels in it's color
+        // do this recursive for small objects (like cuttlery) that do not have the most color in their cluster
+        for(int i = 0; i < 3; ++i)
+        {
+          if(colorMap.empty())
+          {
+            break;
+          }
+
+          std::string mostColor = getObjectWithMostOccurences(colorMap);
+          if( !mostColor.empty() && mostColor.find(object) != std::string::npos)
+          {
+            objectIsGT = true;
+            break;
+          }
+          else
+          {
+            colorMap.erase(mostColor);
+          }
+        }
+
+        if(objectIsGT)
         {
           rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
           rs::Classification classification = rs::create<rs::Classification>(tcas);
@@ -179,10 +194,25 @@ public:
       }
     }
 
+    outInfo("Reduced to " << cleanedClusters.size() << " clusters");
     scene.identifiables.set(cleanedClusters);
-
     return UIMA_ERR_NONE;
   }
+
+  // find the most occuring color
+  std::string getObjectWithMostOccurences(std::map<std::string, int> map)
+  {
+    std::map<std::string, int>::iterator mostColor = map.begin();
+    for(std::map<std::string, int>::iterator it = map.begin(); it != map.end(); ++it)
+    {
+      if(it->second > mostColor->second)
+      {
+        mostColor = it;
+      }
+    }
+    return mostColor->first;
+  }
+
 
   void drawImageWithLock(cv::Mat &d)
   {

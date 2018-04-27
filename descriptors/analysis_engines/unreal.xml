@@ -163,8 +163,8 @@
         <name>camera_config_files</name>
         <value>
           <array>
-<!--            <string>config_mongodb_playback.ini</string>-->
-            <string>config_unreal_vision.ini</string>
+            <string>config_mongodb_playback.ini</string>
+<!--            <string>config_unreal_vision.ini</string>-->
           </array>
         </value>
       </nameValuePair>
@@ -177,16 +177,17 @@
         <node>NormalEstimator</node>
         <node>PlaneAnnotator</node>
         <node>PointCloudClusterExtractor</node>
-<!--        <node>ClusterMerger</node>-->
+        <node>ImageSegmentationAnnotator</node>
+        <node>ClusterMerger</node>
         <node>UnrealGTAnnotator</node>
-        <node>Cluster3DGeometryAnnotator</node>
+<!--        <node>Cluster3DGeometryAnnotator</node>
         <node>PrimitiveShapeAnnotator</node>
         <node>ClusterColorHistogramCalculator</node>
         <node>GogglesAnnotator</node>
         <node>CaffeAnnotator</node>
-        <node>KnnAnnotator</node>   <!--CNN Features -->
-        <node>PCLFeatureExtractor</node>
-        <node>RfAnnotator</node>    <!--VFH Features -->
+        <node>KnnAnnotator</node>   --><!--CNN Features -->
+<!--        <node>PCLFeatureExtractor</node>
+        <node>RfAnnotator</node> -->   <!--VFH Features -->
 <!--        <node>SVMAnnotator</node>-->
 <!--        <node>ResultAdvertiser</node>-->
 <!--        <node>MLNInferencer</node>-->
