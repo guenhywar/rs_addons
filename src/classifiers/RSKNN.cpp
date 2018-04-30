@@ -271,7 +271,7 @@ void RSKNN::RsAnnotation(uima::CAS &tcas, std::string class_name, std::string fe
   classResult.model(database_name);
   if(feature_name == "CNN")
   {
-    classResult.classification_type("CLASS");
+    classResult.classification_type("INSTANCE");
   } else if(feature_name == "VFH")
   {
     classResult.classification_type("SHAPE");

@@ -58,11 +58,8 @@ public:
 
   SvmAnnotator(): DrawingAnnotator(__func__)
   {  }
-#if CV_MAJOR_VERSION == 2
-  RSClassifier* svmObject= new RSSVM;
-#elif CV_MAJOR_VERSION == 3
+
   RSClassifier* svmObject = new RSSVM;
-#endif
 
   TyErrorId initialize(AnnotatorContext &ctx)
   {
@@ -100,153 +97,30 @@ public:
 
   TyErrorId processWithLock(CAS &tcas, ResultSpecification const &res_spec)
   {
-    outInfo("RSSvmAnnotator is running:"<<std::endl);
+
+    outInfo("RSSvmAnnotator is running:");
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
     cas.get(VIEW_COLOR_IMAGE_HD, color);
     std::vector<rs::Cluster> clusters;
     scene.identifiables.filter(clusters);
 
-    if(set_mode =="CL")
-    {
-      if(dataset_use =="WU" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="WU" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="WU" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="WU" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="IAI" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="IAI" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="IAI" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="IAI" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="BOTH" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="BOTH" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="BOTH" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="BOTH" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else
-      {
-        outError("Please sellect the correct value of parameter(feature_use):VFH,CVFH,CNN,VGG16"<<std::endl);
-      }
-    }
 
-    else if(set_mode =="GT")
+    if(feature_use == "VFH" || feature_use == "CVFH")
     {
-      if(dataset_use=="WU" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="WU" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="WU" &&  feature_use =="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="WU" &&  feature_use =="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="IAI" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="IAI" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="IAI" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="IAI" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="BOTH" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="BOTH" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="BOTH" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="BOTH" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        svmObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, svmObject, color, model_labels, tcas);
-      }
-      else
-      {
-        outError("Please sellect the correct value of parameter(feature_use):VFH,CVFH,CNN,VGG16"<<std::endl);
-      }
+      outInfo("Calculation starts with : " << set_mode << "::" << dataset_use << "::" << feature_use);
+      svmObject->processPCLFeature(trained_model_name, set_mode,dataset_use, feature_use, clusters, svmObject, color, model_labels, tcas);
     }
-
+    else if(feature_use == "CNN" || feature_use == "VGG16")
+    {
+      outInfo("Calculation starts with : " << set_mode << "::" << dataset_use << "::" << feature_use);
+      svmObject->processCaffeFeature(trained_model_name, set_mode, dataset_use, feature_use, clusters, svmObject, color, model_labels, tcas);
+    }
     else
     {
-      outError("Please set the parameter (set_mode) to CL or GT "<<std::endl);
+      outError("Please sellect the correct value of parameter(feature_use): VFH, CVFH, CNN, VGG16");
     }
+
     outInfo("calculation is done with SVM"<<std::endl);
     return UIMA_ERR_NONE;
   }

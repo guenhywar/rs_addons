@@ -104,152 +104,27 @@ public:
 
   TyErrorId processWithLock(CAS &tcas, ResultSpecification const &res_spec)
   {
-    outInfo("RSKNNAnnotator is running"<<std::endl);
+    outInfo("RSKNNAnnotator is running:");
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
     cas.get(VIEW_COLOR_IMAGE_HD, color);
     std::vector<rs::Cluster> clusters;
     scene.identifiables.filter(clusters);
 
-    if(set_mode =="CL")
-    {
-      if(dataset_use =="WU" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="WU" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="WU" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="WU" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="IAI" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="IAI" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="IAI" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="IAI" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="BOTH" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="BOTH" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="BOTH" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use=="BOTH" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else
-      {
-        outError("Please sellect the correct value of parameter(feature_use):VFH,CVFH,CNN,VGG16"<<std::endl);
-      }
-    }
 
-    else if(set_mode =="GT")
+    if(feature_use == "VFH" || feature_use == "CVFH")
     {
-      if(dataset_use=="WU" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use=="WU" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="WU" &&  feature_use =="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="WU" &&  feature_use =="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="IAI" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="IAI" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="IAI" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="IAI" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="BOTH" &&  feature_use=="VFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="BOTH" &&  feature_use=="CVFH")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processPCLFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color,model_labels, tcas);
-      }
-      else if(dataset_use =="BOTH" &&  feature_use=="CNN")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else if(dataset_use =="BOTH" &&  feature_use=="VGG16")
-      {
-        std::cout<<"Calculation starts with :" <<set_mode<<"::"<<dataset_use <<"::"<<feature_use<<std::endl;
-        knnObject->processCaffeFeatureKNN(trainKNN_matrix,trainKNNLabel_matrix,set_mode,default_k,dataset_use,feature_use,clusters, knnObject, color, model_labels, tcas);
-      }
-      else
-      {
-        outError("Please sellect the correct value of parameter(feature_use):VFH,CVFH,CNN,VGG16"<<std::endl);
-      }
+      outInfo("Calculation starts with : " << set_mode << "::" << dataset_use << "::" << feature_use);
+      knnObject->processPCLFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, set_mode, default_k, dataset_use, feature_use, clusters, knnObject, color, model_labels, tcas);
     }
-
+    else if(feature_use == "CNN" || feature_use == "VGG16")
+    {
+      outInfo("Calculation starts with : " << set_mode << "::" << dataset_use << "::" << feature_use);
+      knnObject->processCaffeFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, set_mode, default_k, dataset_use, feature_use, clusters, knnObject, color, model_labels, tcas);
+    }
     else
     {
-      outError("Please set the parameter (set_mode) to CL or GT "<<std::endl);
+      outError("Please sellect the correct value of parameter(feature_use): VFH, CVFH, CNN, VGG16");
     }
 
     outInfo("calculation is done with RSKNN"<<std::endl);
