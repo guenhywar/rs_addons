@@ -56,6 +56,7 @@ private:
     "LionCerealBox",
     "MarkenSalz",
     "MeerSalz",
+    "MondaminPancakeMix",
     "NesquikCereal",
     "PfannerGruneIcetea",
     "PfannerPfirsichIcetea",
