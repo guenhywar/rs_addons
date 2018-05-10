@@ -34,7 +34,7 @@ private:
   cv::Mat color, objects, disp;
   std::map<std::string, cv::Vec3b> objectMap;
 
-  std::string posObjects [42] = {
+  std::string posObjects [43] = {
     "AlbiHimbeerJuice",
     "BlueCeramicIkeaMug",
     "BlueMetalPlateWhiteSpeckles",
