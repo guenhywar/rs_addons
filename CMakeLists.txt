@@ -10,6 +10,7 @@ endif(simtrack_nodes_FOUND)
 
 find_package(Caffe QUIET)
 find_package(aruco QUIET)
+find_package(MPI QUIET)
 
 if(Caffe_FOUND)
     message(STATUS "OPTIONAL MODULE Caffe FOUND")
@@ -116,6 +117,7 @@ add_library(rs_classifiers src/classifiers/RSClassifier.cpp
                            src/classifiers/RSKNN.cpp
                            src/classifiers/RSGBT.cpp)
 target_link_libraries(rs_classifiers ${OpenCV_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 
 #this should be an executable
 add_executable(train_classifier src/tools/classifier_trainer.cpp)

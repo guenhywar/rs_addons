@@ -11,12 +11,19 @@
     <configurationParameters>
 
       <configurationParameter>
+        <name>asGT</name>
+        <type>Boolean</type>
+        <multiValued>false</multiValued>
+        <mandatory>true</mandatory>
+      </configurationParameter>
+
+      <configurationParameter>
         <name>DeCafH5File</name>
         <type>String</type>
         <multiValued>false</multiValued>
         <mandatory>true</mandatory>
       </configurationParameter>
-
+      
       <configurationParameter>
         <name>DeCafListFile</name>
         <type>String</type>
@@ -68,6 +75,13 @@
     </configurationParameters>
 
     <configurationParameterSettings>
+      <nameValuePair>
+        <name>asGT</name>
+        <value>
+            <boolean>true</boolean>
+        </value>
+      </nameValuePair>
+
       <nameValuePair>
         <name>DeCafH5File</name>
         <value>
