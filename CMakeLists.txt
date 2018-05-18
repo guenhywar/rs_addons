@@ -8,9 +8,17 @@ if(simtrack_nodes_FOUND)
     set(OPTIONAL_simtrack simtrack_nodes)
 endif(simtrack_nodes_FOUND)
 
+find_package(json_prolog QUIET)
+if(json_prolog_FOUND)
+    message(STATUS "OPTIONAL MODULE simtrack FOUND")
+    set(OPTIONAL_json_prolog json_prolog)
+endif(json_prolog_FOUND)
+
 find_package(Caffe QUIET)
 find_package(aruco QUIET)
 find_package(MPI QUIET)
+find_package(RapidJSON REQUIRED) 
+
 
 if(Caffe_FOUND)
     message(STATUS "OPTIONAL MODULE Caffe FOUND")
@@ -23,7 +31,9 @@ find_package(catkin REQUIRED robosherlock
     message_generation
     message_runtime
     ${OPTIONAL_simtrack}
+    ${OPTIONAL_json_prolog}
     tf_conversions
+    robosherlock_msgs
     )
 
 ################################################################################
@@ -52,6 +62,7 @@ catkin_package(
     )
 
 include_directories(
+    ${RapidJSON_INCLUDE_DIRS}
     ${RS_INCLUDE_DIRS_LIST}
     ${catkin_INCLUDE_DIRS}
     )
@@ -162,3 +173,5 @@ target_link_libraries(rs_classifyOfflineAnnotator rs_classifiers
     ${CATKIN_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${Boost_LIBRARIES})
+
+add_subdirectory(src/annotators)
