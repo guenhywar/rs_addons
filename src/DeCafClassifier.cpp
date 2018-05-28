@@ -41,7 +41,7 @@ private:
   cv::Mat data;
   std::shared_ptr<CaffeProxy> caffeProxyObj;
   cv::flann::Index index;
-  
+
   bool asGT;
   int k;
 
@@ -49,7 +49,7 @@ private:
   pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud;
 public:
 
-  DeCafClassifier(): DrawingAnnotator(__func__),asGT(false)
+  DeCafClassifier(): DrawingAnnotator(__func__), asGT(false)
   {
     cloud = pcl::PointCloud<pcl::PointXYZRGBA>::Ptr(new pcl::PointCloud<pcl::PointXYZRGBA>);
   }
@@ -69,7 +69,7 @@ public:
     ctx.extractValue("caffe_mean_file", caffe_mean_file);
     ctx.extractValue("caffe_label_file", caffe_label_file);
 
-    ctx.extractValue("asGT",asGT);
+    ctx.extractValue("asGT", asGT);
 
     outInfo(h5_file);
     outInfo(list_file);
@@ -155,27 +155,35 @@ public:
       outInfo("The closest " << k << " neighbors for cluser " << i << " are:");
       for(int j = 0; j < k; ++j)
       {
-        outInfo("    " << j << " - " << models[k_indices[j]].first << " (" << k_indices[j] << ") with a distance of: " << k_distances[j] << " confidence: "<<(2-k_distances[j])/2);
+        outInfo("    " << j << " - " << models[k_indices[j]].first << " (" << k_indices[j] << ") with a distance of: " << k_distances[j] << " confidence: " << (2 - k_distances[j]) / 2);
       }
-      float confidence = (2-k_distances[0])/2;
+      float confidence = (2 - k_distances[0]) / 2;
       if(confidence > 0.5)
       {
-      if(!asGT){
-	rs::Detection detection = rs::create<rs::Detection>(tcas);
-        detection.name.set(models[k_indices[0]].first);
-        detection.source.set("DeCafClassifier");
-        detection.confidence.set(confidence);
-        cluster.annotations.append(detection);
-      }
-      else
-      {
-	rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
-	rs::Classification c = rs::create<rs::Classification>(tcas);
-	c.classname.set(models[k_indices[0]].first);
-	c.classifier.set("GroundTruth");
-        gt.classificationGT.set(c);
-        cluster.annotations.append(gt);
-      }
+        if(!asGT)
+        {
+          //          rs::Detection detection = rs::create<rs::Detection>(tcas);
+          //          detection.name.set(models[k_indices[0]].first);
+          //          detection.source.set("DeCafClassifier");
+          //          detection.confidence.set(confidence);
+          //          cluster.annotations.append(detection);
+
+          rs::Classification c = rs::create<rs::Classification>(tcas);
+          c.classname.set(models[k_indices[0]].first);
+          c.classifier.set("DeCafClassifier");
+
+          cluster.annotations.append(c);
+
+        }
+        else
+        {
+          rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
+          rs::Classification c = rs::create<rs::Classification>(tcas);
+          c.classname.set(models[k_indices[0]].first);
+          c.classifier.set("GroundTruth");
+          gt.classificationGT.set(c);
+          cluster.annotations.append(gt);
+        }
 
         rs::ImageROI image_roi = cluster.rois();
         cv::Rect rect;

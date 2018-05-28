@@ -124,16 +124,19 @@ public:
     rapidjson::Document doc;
     doc.Parse(jsonQuery.c_str());
     std::string templateToFit;
-    if(doc.HasMember("cad-model"))
+    if(doc.HasMember("detect"))
     {
-      templateToFit = doc["cad-model"].GetString();
-      if(templateToFit == "")
+      rapidjson::Value &detection = doc["detect"];
+      if(detection.HasMember("cad-model"))
       {
-        outError("No model name defined");
-        return UIMA_ERR_NONE;
+        templateToFit = detection["cad-model"].GetString();
+        if(templateToFit == "")
+        {
+          outError("No model name defined");
+          return UIMA_ERR_NONE;
+        }
       }
     }
-
     rs::Scene scene = cas.getScene();
     std::vector<rs::Cluster> clusters;
     std::vector<rs::Plane> planes;
@@ -167,7 +170,7 @@ public:
       {
         continue;
       }
-      std::vector<rs::Detection> detections;
+      std::vector<rs::Classification> detections;
       cluster.annotations.filter(detections);
       if(detections.empty())
       {
@@ -178,7 +181,7 @@ public:
 
       for(auto d : detections)
       {
-        if(d.name() == templateToFit)
+        if(d.classname() == templateToFit)
         {
           foundObjectForTemplate = true;
           break;
@@ -186,8 +189,8 @@ public:
       }
       if(!foundObjectForTemplate)
       {
-        outInfo("No detection with "<<templateToFit<< "name");
-	continue;
+        outInfo("No detection with " << templateToFit << "name");
+        continue;
       }
       //Fit result of drill using local features/template matching
       FeatureCloud object_template;
@@ -374,13 +377,13 @@ public:
       //      cv::cvtColor(negative, negative, CV_BGR2GRAY);
     }
 
-//    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(2, 2));
-//    cv::morphologyEx(negative, negative, cv::MORPH_CLOSE, element, cv::Point(-1, -1), 5);
+    //    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(2, 2));
+    //    cv::morphologyEx(negative, negative, cv::MORPH_CLOSE, element, cv::Point(-1, -1), 5);
 
-//    cv::Canny(negative, negative, 25, 75);
-//    cv::dilate(negative, negative, element);
+    //    cv::Canny(negative, negative, 25, 75);
+    //    cv::dilate(negative, negative, element);
 
-//    dispImg = negative.clone();
+    //    dispImg = negative.clone();
     img.setTo(cv::Scalar(0, 0, 200), negative);
   }
 
