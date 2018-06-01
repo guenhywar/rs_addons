@@ -59,6 +59,14 @@ class HandleAnnotator : public DrawingAnnotator
     std::string name;
   };
 
+
+  struct Cluster
+  {
+    size_t indicesIndex;
+    cv::Rect roi, roiHires;
+    cv::Mat mask, maskHires;
+  };
+
 public:
   tf::StampedTransform camToWorld, worldToCam;
   std::vector<Region> regions;
@@ -207,8 +215,26 @@ public:
     getSemanticMapEntries(cas, "Handle", handles);
     for(int i = 0; i < handle_indices.size(); ++i)
     {
-      outInfo("clusters no : " << i << " size: " << handle_indices[i].indices.size());
-      rs::HandleAnnotation handleAnnot = rs::create<rs::HandleAnnotation>(tcas);
+      rs::Cluster c = rs::create<rs::Cluster>(tcas);
+      Cluster cluster;
+      cluster.indicesIndex = i;
+      createImageRoi(cluster);
+
+      rs::ReferenceClusterPoints rcp = rs::create<rs::ReferenceClusterPoints>(tcas);
+      rs::PointIndices uimaIndices = rs::conversion::to(tcas, handle_indices[i]);
+      rcp.indices.set(uimaIndices);
+      c.points.set(rcp);
+      c.source.set("HandleAnnotator");
+
+
+      rs::ImageROI imageRoi = rs::create<rs::ImageROI>(tcas);
+      imageRoi.mask(rs::conversion::to(tcas, cluster.mask));
+      imageRoi.mask_hires(rs::conversion::to(tcas, cluster.maskHires));
+      imageRoi.roi(rs::conversion::to(tcas, cluster.roi));
+      imageRoi.roi_hires(rs::conversion::to(tcas, cluster.roiHires));
+
+      c.rois.set(imageRoi);
+
       Eigen::Vector4f centroid;
       pcl::compute3DCentroid(*cloud_ptr, handle_indices[i], centroid);
       tf::Stamped<tf::Pose> pose;
@@ -217,13 +243,17 @@ public:
       outInfo("FRAME ID: " << pose.frame_id_);
       pose.setOrigin(tf::Vector3(centroid[0], centroid[1], centroid[2]));
       pose.setRotation(tf::Quaternion(0, 0, 0, 1));
-      handleAnnot.pose.set(rs::conversion::to(tcas, pose));
 
+      rs::PoseAnnotation poseAnnotation = rs::create<rs::PoseAnnotation>(tcas);
+      poseAnnotation.source.set("HandleAnnotator");
+      poseAnnotation.camera.set(rs::conversion::to(tcas, pose));
+      poseAnnotation.world.set(rs::conversion::to(tcas, pose));
+      c.annotations.append(poseAnnotation);
 
       //find nearest handle in sem map amd attach name
-
       double min_dist = std::numeric_limits<float>::max();
       int min_dist_index = -1;
+
       for(int i = 0; i < handles.size(); i++)
       {
         rs::SemanticMapObject &semHandle = handles[i];
@@ -243,13 +273,15 @@ public:
             min_dist = dist;
           }
         }
-
       }
-      outInfo(handles[min_dist_index].name());
-      rs::PointIndices uimaIndices = rs::conversion::to(tcas, handle_indices[i]);
-      handleAnnot.indices.set(uimaIndices);
-      handleAnnot.name.set(handles[min_dist_index].name());
-      scene.annotations.append(handleAnnot);
+
+      rs::Detection detection = rs::create<rs::Detection>(tcas);
+      detection.name.set(handles[min_dist_index].name());
+      detection.source.set("HandleAnnotator");
+      detection.confidence.set(1.0);
+      c.annotations.append(detection);
+
+      scene.identifiables.append(c);
     }
 
     //for visualization purposes
@@ -385,6 +417,42 @@ public:
       if(objects[i].typeName() == name)
         mapObjects.push_back(objects[i]);
     }
+  }
+
+  void createImageRoi(Cluster &cluster) const
+  {
+    const pcl::PointIndices &indices = handle_indices[cluster.indicesIndex];
+
+    size_t width = cloud_ptr->width;
+    size_t height = cloud_ptr->height;
+
+    int min_x = width;
+    int max_x = -1;
+    int min_y = height;
+    int max_y = -1;
+
+    cv::Mat mask_full = cv::Mat::zeros(height, width, CV_8U);
+
+    // get min / max extents (rectangular bounding box in image (pixel) coordinates)
+    //#pragma omp parallel for
+    for(size_t i = 0; i < indices.indices.size(); ++i)
+    {
+      const int idx = indices.indices[i];
+      const int x = idx % width;
+      const int y = idx / width;
+
+      min_x = std::min(min_x, x);
+      min_y = std::min(min_y, y);
+      max_x = std::max(max_x, x);
+      max_y = std::max(max_y, y);
+
+      mask_full.at<uint8_t>(y, x) = 255;
+    }
+
+    cluster.roi = cv::Rect(min_x, min_y, max_x - min_x + 1, max_y - min_y + 1);
+    cluster.roiHires = cv::Rect(cluster.roi.x << 1, cluster.roi.y << 1, cluster.roi.width << 1, cluster.roi.height << 1);
+    mask_full(cluster.roi).copyTo(cluster.mask);
+    cv::resize(cluster.mask, cluster.maskHires, cv::Size(0, 0), 2.0, 2.0, cv::INTER_NEAREST);
   }
 
 };
