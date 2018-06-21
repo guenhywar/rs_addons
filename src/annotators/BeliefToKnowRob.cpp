@@ -36,7 +36,7 @@ public:
     ss << "['" << p.frame_id_ << "',_,"
        << "[" << p.getOrigin().x() << "," << p.getOrigin().y() << "," << p.getOrigin().z() << "],"
        << "[" << p.getRotation().x() << "," << p.getRotation().y() << "," << p.getRotation().z() <<","<<p.getRotation().w()<<"]],"
-       << "[0.1,6.28], ID)";
+       << "0.1, ID)";
     return ss.str();
   }
 
