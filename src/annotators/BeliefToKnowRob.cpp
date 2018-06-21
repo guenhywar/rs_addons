@@ -32,7 +32,7 @@ public:
   std::string buildPerceivecAtQuery(const  tf::Stamped<tf::Pose> &p, const std::string &name)
   {
     std::stringstream ss;
-    ss << "belief_perceived_at(" << rs_queryanswering::krNameMapping[name] << ",";
+    ss << "belief_perceived_at(kitchen:'" << name << "',";
     ss << "['" << p.frame_id_ << "',_,"
        << "[" << p.getOrigin().x() << "," << p.getOrigin().y() << "," << p.getOrigin().z() << "],"
        << "[" << p.getRotation().x() << "," << p.getRotation().y() << "," << p.getRotation().z() <<","<<p.getRotation().w()<<"]],"
@@ -62,13 +62,13 @@ public:
     for(rs::Object & obj : objects)
     {
       outInfo("");
-      std::vector<rs::Detection> detections;
+      std::vector<rs::Classification> detections;
       obj.annotations.filter(detections);
       if(detections.empty())
       {
         continue;
       }
-      std::string name = detections[0].name();
+      std::string name = detections[0].classname();
 
       std::vector<rs::Geometry> geom;
       obj.annotations.filter(geom);
