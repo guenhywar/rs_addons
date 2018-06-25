@@ -35,8 +35,8 @@ public:
     ss << "belief_perceived_at(kitchen:'" << name << "',";
     ss << "['" << p.frame_id_ << "',_,"
        << "[" << p.getOrigin().x() << "," << p.getOrigin().y() << "," << p.getOrigin().z() << "],"
-       << "[" << p.getRotation().x() << "," << p.getRotation().y() << "," << p.getRotation().z() <<","<<p.getRotation().w()<<"]],"
-       << "0.1, ID)";
+       << "[" << p.getRotation().x() << "," << p.getRotation().y() << "," << p.getRotation().z() << "," << p.getRotation().w() << "]],"
+       << "0.2, ID)";
     return ss.str();
   }
 
@@ -47,6 +47,8 @@ public:
     outInfo("process start");
     rs::StopWatch clock;
     rs::SceneCas cas(tcas);
+    rs::Scene scene = cas.getScene();
+    uint64_t now = scene.timestamp();
 
     std::vector<rs::Object> objects;
     cas.get(VIEW_OBJECTS, objects);
@@ -59,16 +61,18 @@ public:
 
     json_prolog::Prolog pl;
 
-    for(rs::Object & obj : objects)
+    for(rs::Object &obj : objects)
     {
-      outInfo("");
-      std::vector<rs::Classification> detections;
-      obj.annotations.filter(detections);
-      if(detections.empty())
+      double lastSeen = (now - (uint64_t)obj.lastSeen()) / 1000000000.0;
+      if(lastSeen != 0)
+        continue;
+      std::vector<rs::Classification> classificationResult;
+      obj.annotations.filter(classificationResult);
+      if(classificationResult.empty())
       {
         continue;
       }
-      std::string name = detections[0].classname();
+      std::string name = classificationResult[0].classname();
 
       std::vector<rs::Geometry> geom;
       obj.annotations.filter(geom);
@@ -85,8 +89,8 @@ public:
       for(auto bdg : bdgs)
       {
         outInfo(bdg["ID"].toString());
-	std::string uid = bdg["ID"].toString();
-        obj.uid.set(uid.substr(1,uid.size()-2));
+        std::string uid = bdg["ID"].toString();
+        obj.uid.set(uid.substr(1, uid.size() - 2));
         break;
       }
       idx ++;
