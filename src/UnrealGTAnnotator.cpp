@@ -150,38 +150,35 @@ public:
         }
       }
 
-      for(auto object : posObjects)
+      // for small objects, that do not have the most pixels in their roi (cutlery) search for a suitable object in a depth of 3.
+      for(int i = 0; i < 3; ++i)
       {
-        bool objectIsGT = false;
-        std::map<std::string, int> colorMap = colorCount;
-
-        // check for the object with the most pixels in it's color
-        // do this recursive for small objects (like cuttlery) that do not have the most color in their cluster
-        for(int i = 0; i < 3; ++i)
+        std::string foundObj = "";
+        if(colorCount.empty())
         {
-          if(colorMap.empty())
-          {
-            break;
-          }
+          break;
+        }
 
-          std::string mostColor = getObjectWithMostOccurences(colorMap);
-          if( !mostColor.empty() && mostColor.find(object) != std::string::npos)
+        std::string mostColor = getObjectWithMostOccurences(colorCount);
+        for(auto object : posObjects)
+        {
+          if(!mostColor.empty() && mostColor.find(object) != std::string::npos)
           {
-            objectIsGT = true;
+            foundObj = object;
             break;
           }
           else
           {
-            colorMap.erase(mostColor);
+            colorCount.erase(mostColor);
           }
         }
 
-        if(objectIsGT)
+        if(foundObj != "" && !foundObj.empty())
         {
           rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
           rs::Classification classification = rs::create<rs::Classification>(tcas);
           classification.classification_type.set("ground_truth");
-          classification.classname.set(object);
+          classification.classname.set(foundObj);
           classification.classifier.set("UnrealEngine");
           classification.source.set("UnrealGTAnnotator");
           gt.classificationGT.set(classification);
@@ -189,7 +186,7 @@ public:
 
           cleanedClusters.push_back(cluster);
 
-          drawResults(roi, object);
+          drawResults(roi, foundObj);
           break;
         }
       }
