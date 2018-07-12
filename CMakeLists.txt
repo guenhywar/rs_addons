@@ -18,7 +18,9 @@ find_package(Caffe QUIET)
 find_package(aruco QUIET)
 find_package(MPI QUIET)
 find_package(RapidJSON REQUIRED) 
-
+find_package(Boost REQUIRED COMPONENTS python)
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 if(Caffe_FOUND)
     add_definitions(-DWITH_CAFFE)
@@ -83,6 +85,8 @@ find_additional_files()
 #If you want to divide your projects into subprojects include the subdirectories
 #each containing a CMakeLists.txt here
 #add_subdirectory(src/xxx)
+
+catkin_python_setup()
 
 if(simtrack_nodes_FOUND)
     rs_add_library(rs_simtrack src/SimtrackDetection.cpp)
@@ -168,5 +172,11 @@ target_link_libraries(rs_classifyOfflineAnnotator rs_classifiers
     ${CATKIN_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${Boost_LIBRARIES})
+
+rs_add_library(rs_ssdDetectionAnnotator src/SSDDetectionAnnotator.cpp)
+target_link_libraries(rs_ssdDetectionAnnotator
+    ${CATKIN_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    boost_numpy)
 
 add_subdirectory(src/annotators)
