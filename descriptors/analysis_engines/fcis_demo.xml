@@ -216,7 +216,7 @@
     <flowConstraints>
       <fixedFlow>
        <node>CollectionReader</node>
-       <node>SSDDetectionAnnotator</node>
+       <node>FCISInstanceSegmentationAnnotator</node>
       </fixedFlow>
     </flowConstraints>
     <typePriorities/>

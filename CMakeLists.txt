@@ -179,4 +179,10 @@ target_link_libraries(rs_ssdDetectionAnnotator
     ${OpenCV_LIBRARIES}
     boost_numpy)
 
+rs_add_library(rs_fcisInstanceSegmentationAnnotator src/FCISInstanceSegmentationAnnotator.cpp)
+target_link_libraries(rs_fcisInstanceSegmentationAnnotator
+    ${CATKIN_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    boost_numpy)
+
 add_subdirectory(src/annotators)
