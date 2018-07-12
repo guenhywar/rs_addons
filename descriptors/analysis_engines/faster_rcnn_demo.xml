@@ -219,7 +219,7 @@
     <flowConstraints>
       <fixedFlow>
        <node>CollectionReader</node>
-       <node>FCISInstanceSegmentationAnnotator</node>
+       <node>FasterRCNNDetectionAnnotator</node>
       </fixedFlow>
     </flowConstraints>
     <typePriorities/>

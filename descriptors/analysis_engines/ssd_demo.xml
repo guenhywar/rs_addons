@@ -64,6 +64,9 @@
     <delegateAnalysisEngine key="FCISInstanceSegmentationAnnotator">
       <import location="../annotators/FCISInstanceSegmentationAnnotator.xml"/>
     </delegateAnalysisEngine>
+    <delegateAnalysisEngine key="FasterRCNNDetectionAnnotator">
+      <import location="../annotators/FasterRCNNDetectionAnnotator.xml"/>
+    </delegateAnalysisEngine>
     <delegateAnalysisEngine key="FeatureAnnotator">
       <import location="../../../robosherlock/descriptors/annotators/annotation/FeatureAnnotator.xml"/>
     </delegateAnalysisEngine>
