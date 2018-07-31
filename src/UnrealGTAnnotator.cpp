@@ -31,54 +31,10 @@ using namespace uima;
 class UnrealGTAnnotator : public DrawingAnnotator
 {
 private:
+  std::string gtFilePath;
   cv::Mat color, objects, disp;
   std::map<std::string, cv::Vec3b> objectMap;
-
-  std::string posObjects [43] = {
-    "AlbiHimbeerJuice",
-    "BlueCeramicIkeaMug",
-    "BlueMetalPlateWhiteSpeckles",
-    "BluePlasticBowl",
-    "BluePlasticFork",
-    "BluePlasticKnife",
-    "BluePlasticSpoon",
-    "CupEcoOrange",
-    "EdekaRedBowl",
-    "ElBrygCoffee",
-    "JaMilch",
-    "JodSalz",
-    "KelloggsCornFlakes",
-    "KelloggsToppasMini",
-    "KnusperSchokoKeks",
-    "KoellnMuesliKnusperHonigNuss",
-    "LargeGreySpoon",
-    "LinuxCup",
-    "LionCerealBox",
-    "MarkenSalz",
-    "MeerSalz",
-    "MondaminPancakeMix",
-    "NesquikCereal",
-    "PfannerGruneIcetea",
-    "PfannerPfirsichIcetea",
-    "RedMetalBowlWhiteSpeckles",
-    "RedMetalCupWhiteSpeckles",
-    "RedMetalPlateWhiteSpeckles",
-    "RedPlasticFork",
-    "RedPlasticKnife",
-    "RedPlasticSpoon",
-    "ReineButterMilch",
-    "SeverinPancakeMaker",
-    "SiggBottle",
-    "SlottedSpatula",
-    "SojaMilch",
-    "SpitzenReis",
-    "TomatoAlGustoBasilikum",
-    "TomatoSauceOroDiParma",
-    "VollMilch",
-    "WeideMilchSmall",
-    "WhiteCeramicIkeaBowl",
-    "YellowCeramicPlate"
-  };
+  std::map<std::string, std::string> gtMap;
 
 public:
 
@@ -87,6 +43,19 @@ public:
   TyErrorId initialize(AnnotatorContext &ctx)
   {
     outInfo("initialize");
+
+    ctx.extractValue("gtFilePath", gtFilePath);
+    cv::FileStorage fs(gtFilePath, cv::FileStorage::READ);
+
+    cv::FileNode fn = fs.root();
+    for(cv::FileNodeIterator fit = fn.begin(); fit != fn.end(); ++fit)
+    {
+      cv::FileNode object = *fit;
+      outInfo(object.name());
+      gtMap.insert(std::pair<std::string, std::string>(object.name(), fs[object.name()]));
+    }
+
+    fs.release();
     return UIMA_ERR_NONE;
   }
 
@@ -100,6 +69,7 @@ public:
   {
     MEASURE_TIME;
     outInfo("process begins");
+
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
 
@@ -160,11 +130,13 @@ public:
         }
 
         std::string mostColor = getObjectWithMostOccurences(colorCount);
-        for(auto object : posObjects)
+
+        std::map<std::string, std::string>::iterator gtMapIt;
+        for(gtMapIt = gtMap.begin(); gtMapIt != gtMap.end(); ++gtMapIt)
         {
-          if(!mostColor.empty() && mostColor.find(object) != std::string::npos)
+          if(!mostColor.empty() && mostColor.find(gtMapIt->first) != std::string::npos)
           {
-            foundObj = object;
+            foundObj = gtMapIt->second;
             break;
           }
           else

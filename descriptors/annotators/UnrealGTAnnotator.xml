@@ -10,17 +10,18 @@
     <vendor/>
     <configurationParameters>
         <configurationParameter>
-            <name>test_param</name>
-            <type>Float</type>
+            <name>gtFilePath</name>
+            <type>string</type>
             <multiValued>false</multiValued>
             <mandatory>false</mandatory>
         </configurationParameter>
     </configurationParameters>
     <configurationParameterSettings>
         <nameValuePair>
-            <name>test_param</name>
+            <name>gtFilePath</name>
+            <description>The path to the .yaml file with the gt mappings</description>
             <value>
-                <float>0.01</float>
+                <string>/home/dominik/ros_ws/src/rs_addons/trainedData/unrealGroundTruth.yaml</string>
             </value>
         </nameValuePair>
     </configurationParameterSettings>
