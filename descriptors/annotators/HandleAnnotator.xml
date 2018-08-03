@@ -4,6 +4,7 @@
   <annotatorImplementationName>rs_handleAnnotator</annotatorImplementationName>
   <analysisEngineMetaData>
     <name>HandleAnnotator</name>
+    <outputDomain>handle</outputDomain>
     <description/>
     <version>1.0</version>
     <vendor/>
@@ -20,7 +21,7 @@
       <capability>
         <inputs/>
         <outputs>
-          <type allAnnotatorFeatures="true">rs.annotation.HandleAnnotation</type>
+          <type allAnnotatorFeatures="true">rs.annotation.Detection</type>
         </outputs>
         <inputSofas>
           <sofaName>rs.pcl.PointCloud</sofaName>

@@ -5,6 +5,7 @@
   <annotatorImplementationName>rs_deCafClassifier</annotatorImplementationName>
   <analysisEngineMetaData>
     <name>DeCafClassifier</name>
+    <outputDomain>CupEcoOrange, BluePlasticSpoon, WeideMilchSmall, EdekaRedBowl, KoellnMuesliKnusperHonigNuss</outputDomain>
     <description/>
     <version>1.0</version>
     <vendor/>
