@@ -100,6 +100,9 @@
     <delegateAnalysisEngine key="MLNInferencer">
       <import location="../../../robosherlock/descriptors/annotators/recognition/MLNInferencer.xml"/>
     </delegateAnalysisEngine>
+    <delegateAnalysisEngine key="MaskRCNNInstanceSegmentationAnnotator">
+      <import location="../annotators/MaskRCNNInstanceSegmentationAnnotator.xml"/>
+    </delegateAnalysisEngine>
     <delegateAnalysisEngine key="NormalEstimator">
       <import location="../../../robosherlock/descriptors/annotators/annotation/NormalEstimator.xml"/>
     </delegateAnalysisEngine>

@@ -191,4 +191,13 @@ target_link_libraries(rs_fcisInstanceSegmentationAnnotator
     ${OpenCV_LIBRARIES}
     boost_numpy)
 
+rs_add_library(rs_maskRCNNInstanceSegmentationAnnotator src/MaskRCNNInstanceSegmentationAnnotator.cpp)
+target_link_libraries(rs_maskRCNNInstanceSegmentationAnnotator
+    ${CATKIN_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    boost_numpy)
+
+# download and install trained data
+add_custom_target(install_trained_data ALL COMMAND ${PROJECT_SOURCE_DIR}/scripts/install_trained_data.py)
+
 add_subdirectory(src/annotators)

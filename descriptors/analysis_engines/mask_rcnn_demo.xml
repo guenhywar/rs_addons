@@ -222,7 +222,7 @@
     <flowConstraints>
       <fixedFlow>
        <node>CollectionReader</node>
-       <node>SSDDetectionAnnotator</node>
+       <node>MaskRCNNInstanceSegmentationAnnotator</node>
       </fixedFlow>
     </flowConstraints>
     <typePriorities/>
