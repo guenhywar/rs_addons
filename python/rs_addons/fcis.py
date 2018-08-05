@@ -8,6 +8,8 @@ from chainercv.experimental.links import FCISResNet101
 from chainercv.utils import mask_to_bbox
 import rospkg
 
+from rs_addons.coco_utils import coco_instance_segmentation_label_names
+
 
 def mask_to_roi_mask(mask, bbox):
     roi_mask = []
@@ -33,12 +35,31 @@ class FCISInstanceSegmentationPredictor(object):
             pretrained_model = osp.join(
                 r.get_path('rs_addons'),
                 'trained_data/fcis_resnet101_sbd_trained.npz')
+            self.model = model_class(
+                n_fg_class=len(self.label_names),
+                pretrained_model=pretrained_model)
+        elif pretrained_model == 'coco' and model == 'fcis_resnet101':
+            self.label_names = coco_instance_segmentation_label_names
+            pretrained_model = osp.join(
+                r.get_path('rs_addons'),
+                'trained_data/fcis_resnet101_coco_trained.npz')
+            proposal_creator_params = {
+                'nms_thresh': 0.7,
+                'n_train_pre_nms': 6000,
+                'n_train_post_nms': 300,
+                'n_test_pre_nms': 6000,
+                'n_test_post_nms': 300,
+                'force_cpu_nms': False,
+                'min_size': 2
+            }
+            self.model = model_class(
+                n_fg_class=len(self.label_names),
+                anchor_scales=(4, 8, 16, 32),
+                proposal_creator_params=proposal_creator_params,
+                pretrained_model=pretrained_model)
         else:
             warnings.warn('no pretrained model: {}'.format(pretrained_model))
 
-        self.model = model_class(
-            n_fg_class=len(self.label_names),
-            pretrained_model=pretrained_model)
         self.model.score_thresh = score_thresh
         self.gpu = gpu
         if self.gpu >= 0:

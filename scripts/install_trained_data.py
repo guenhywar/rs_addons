@@ -72,6 +72,15 @@ def main():
         quiet=quiet,
     )
 
+    # fcis resnet101 coco
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/fcis_resnet101_coco_trained.npz',
+        url='https://drive.google.com/uc?id=1WEOs2kRSmyFIGv33xst_w4x9A0ZexRkZ',
+        md5='d2a7c6716b1e4094494a6f3e472e4279',
+        quiet=quiet,
+    )
+
     # maskrcnn resnet50 coco
     download_data(
         pkg_name=PKG,
