@@ -81,6 +81,15 @@ def main():
         quiet=quiet,
     )
 
+    # maskrcnn resnet50 sbd
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/mask_rcnn_resnet50_sbd_trained.npz',
+        url='https://drive.google.com/uc?id=1kDgdypzqSq7aaMEEOk3oM4onerDhYVD8',
+        md5='98a318a00e3b672dbfee685694d13463',
+        quiet=quiet,
+    )
+
     # maskrcnn resnet50 coco
     download_data(
         pkg_name=PKG,

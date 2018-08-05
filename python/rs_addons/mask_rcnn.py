@@ -5,6 +5,7 @@ import warnings
 from chainer.backends import cuda
 from chainer_mask_rcnn.functions import roi_align_2d
 from chainer_mask_rcnn.models import MaskRCNNResNet
+from chainercv.datasets import sbd_instance_segmentation_label_names
 import rospkg
 
 from rs_addons.coco_utils import coco_instance_segmentation_label_names
@@ -21,19 +22,28 @@ class MaskRCNNInstanceSegmentationPredictor(object):
             model_class = MaskRCNNResNet
             n_layers = 50
             mean = (123.152, 115.903, 103.063)
-            anchor_scales = (2, 4, 8, 16, 32)
-            min_size = 800
-            max_size = 1333
-            roi_size = 7
         else:
             warnings.warn('no model class: {}'.format(model))
 
         r = rospkg.RosPack()
-        if pretrained_model == 'coco' and model == 'mask_rcnn_resnet50':
+        if pretrained_model == 'sbd' and model == 'mask_rcnn_resnet50':
+            self.label_names = sbd_instance_segmentation_label_names
+            pretrained_model = osp.join(
+                r.get_path('rs_addons'),
+                'trained_data/mask_rcnn_resnet50_sbd_trained.npz')
+            anchor_scales = (4, 8, 16, 32)
+            min_size = 600
+            max_size = 1000
+            roi_size = 14
+        elif pretrained_model == 'coco' and model == 'mask_rcnn_resnet50':
             self.label_names = coco_instance_segmentation_label_names
             pretrained_model = osp.join(
                 r.get_path('rs_addons'),
                 'trained_data/mask_rcnn_resnet50_coco_trained.npz')
+            anchor_scales = (2, 4, 8, 16, 32)
+            min_size = 800
+            max_size = 1333
+            roi_size = 7
         else:
             warnings.warn('no pretrained model: {}'.format(pretrained_model))
 
