@@ -16,7 +16,6 @@ class MaskRCNNInstanceSegmentationPredictor(object):
     def __init__(
             self, model='mask_rcnn_resnet50', pretrained_model='coco',
             gpu=-1, score_thresh=0.3):
-        self.label_names = coco_instance_segmentation_label_names
         self.score_thresh = score_thresh
         if model == 'mask_rcnn_resnet50':
             model_class = MaskRCNNResNet
@@ -29,11 +28,15 @@ class MaskRCNNInstanceSegmentationPredictor(object):
         else:
             warnings.warn('no model class: {}'.format(model))
 
-        if pretrained_model == 'coco':
-            r = rospkg.RosPack()
+        r = rospkg.RosPack()
+        if pretrained_model == 'coco' and model == 'mask_rcnn_resnet50':
+            self.label_names = coco_instance_segmentation_label_names
             pretrained_model = osp.join(
                 r.get_path('rs_addons'),
                 'trained_data/mask_rcnn_resnet50_coco_trained.npz')
+        else:
+            warnings.warn('no pretrained model: {}'.format(pretrained_model))
+
         self.model = model_class(
             n_layers=n_layers,
             n_fg_class=len(self.label_names),
