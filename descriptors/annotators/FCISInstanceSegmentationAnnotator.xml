@@ -31,6 +31,13 @@
             <mandatory>false</mandatory>
         </configurationParameter>
 
+        <configurationParameter>
+            <name>score_thresh</name>
+            <type>Float</type>
+            <multiValued>false</multiValued>
+            <mandatory>false</mandatory>
+        </configurationParameter>
+
     </configurationParameters>
     <configurationParameterSettings>
 
@@ -55,7 +62,14 @@
             </value>
         </nameValuePair>
 
-    </configurationParameterSettings>
+         <nameValuePair>
+            <name>score_thresh</name>
+            <value>
+                <float>0.3</float>
+            </value>
+        </nameValuePair>
+
+   </configurationParameterSettings>
     <typeSystemDescription>
         <imports>
             <import location="../typesystem/all_types.xml"/>
