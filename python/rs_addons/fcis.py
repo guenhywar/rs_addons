@@ -22,7 +22,7 @@ def mask_to_roi_mask(mask, bbox):
 class FCISInstanceSegmentationPredictor(object):
 
     def __init__(
-            self, model='fcis_resnet101', pretrained_model='sbd',
+            self, model='fcis_resnet101', pretrained_model='coco',
             gpu=-1, score_thresh=0.3):
         if model == 'fcis_resnet101':
             model_class = FCISResNet101

@@ -51,7 +51,7 @@
         <nameValuePair>
             <name>pretrained_model</name>
             <value>
-                <string>sbd</string>
+                <string>coco</string>
             </value>
         </nameValuePair>
 
