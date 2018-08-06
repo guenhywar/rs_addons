@@ -36,9 +36,15 @@ private:
   std::map<std::string, cv::Vec3b> objectMap;
   std::map<std::string, std::string> gtMap;
 
+  enum
+  {
+    objImage,
+    gtImage,
+  } dispMode;
+
 public:
 
-  UnrealGTAnnotator() : DrawingAnnotator(__func__) {}
+  UnrealGTAnnotator() : DrawingAnnotator(__func__), dispMode(gtImage) {}
 
   TyErrorId initialize(AnnotatorContext &ctx)
   {
@@ -123,7 +129,6 @@ public:
       // for small objects, that do not have the most pixels in their roi (cutlery) search for a suitable object in a depth of 3.
       for(int i = 0; i < 3; ++i)
       {
-        std::string foundObj = "";
         if(colorCount.empty())
         {
           break;
@@ -131,26 +136,28 @@ public:
 
         std::string mostColor = getObjectWithMostOccurences(colorCount);
 
-        std::map<std::string, std::string>::iterator gtMapIt;
-        for(gtMapIt = gtMap.begin(); gtMapIt != gtMap.end(); ++gtMapIt)
+        //object names should follow Unreal Engine naming standard: SM_ObjectName_X
+        //if that standard not given, the object does not belong to the experiment/the objects that should be annotated
+        std::vector<std::string> objNameParts;
+        boost::split(objNameParts, mostColor, boost::is_any_of("_"));
+        if(objNameParts.size() < 3 || objNameParts[1].empty() || objNameParts[1] == "")
         {
-          if(!mostColor.empty() && mostColor.find(gtMapIt->first) != std::string::npos)
-          {
-            foundObj = gtMapIt->second;
-            break;
-          }
-          else
-          {
-            colorCount.erase(mostColor);
-          }
+          colorCount.erase(mostColor);
+          continue;
         }
 
-        if(foundObj != "" && !foundObj.empty())
+        auto foundObj = gtMap.find(objNameParts[1]);
+
+        if(foundObj == gtMap.end())
+        {
+          colorCount.erase(mostColor);
+        }
+        else
         {
           rs::GroundTruth gt = rs::create<rs::GroundTruth>(tcas);
           rs::Classification classification = rs::create<rs::Classification>(tcas);
           classification.classification_type.set("ground_truth");
-          classification.classname.set(foundObj);
+          classification.classname.set(foundObj->second);
           classification.classifier.set("UnrealEngine");
           classification.source.set("UnrealGTAnnotator");
           gt.classificationGT.set(classification);
@@ -158,7 +165,7 @@ public:
 
           cleanedClusters.push_back(cluster);
 
-          drawResults(roi, foundObj);
+          drawResults(roi, foundObj->second);
           break;
         }
       }
@@ -166,6 +173,11 @@ public:
 
     outInfo("Reduced to " << cleanedClusters.size() << " clusters");
     scene.identifiables.set(cleanedClusters);
+
+    //when running with multiple images and therefor with multiple objectMaps, the map gets expanded by the new occuring objects per image.
+    //clearing the map prevents that
+    objectMap.clear();
+
     return UIMA_ERR_NONE;
   }
 
@@ -186,7 +198,14 @@ public:
 
   void drawImageWithLock(cv::Mat &d)
   {
-    d = disp.clone();
+    switch(dispMode)
+    {
+      case objImage:
+        d = objects.clone();
+        break;
+      default:
+        d = disp.clone();
+    }
   }
 
   void drawResults(cv::Rect roi,std::string gt)
@@ -195,6 +214,22 @@ public:
       int baseLine;
       cv::Size textSize = cv::getTextSize(gt ,cv::FONT_HERSHEY_PLAIN,1.5,2.0, &baseLine);
       cv::putText(disp, gt ,cv::Point(roi.x,roi.y-textSize.height), cv::FONT_HERSHEY_PLAIN, 1.5, CV_RGB(255, 20, 147), 2.0);
+  }
+
+  bool callbackKey(const int key, const Source source)
+  {
+    switch(key)
+    {
+    case 'g':
+    case 'G':
+      dispMode = gtImage;
+      break;
+    case 'o':
+    case 'O':
+      dispMode = objImage;
+      break;
+    }
+    return true;
   }
 
 };

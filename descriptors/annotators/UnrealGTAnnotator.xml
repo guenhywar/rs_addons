@@ -21,7 +21,7 @@
             <name>gtFilePath</name>
             <description>The path to the .yaml file with the gt mappings</description>
             <value>
-                <string>/home/dominik/ros_ws/src/rs_addons/trainedData/unrealGroundTruth.yaml</string>
+                <string>/home/dominik/ros_ws/src/rs_addons/data/unrealGroundTruth.yaml</string>
             </value>
         </nameValuePair>
     </configurationParameterSettings>
