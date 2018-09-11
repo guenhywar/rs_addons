@@ -24,7 +24,11 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <ros/package.h>
+
+#ifdef WITH_CAFFE
 #include <rs/recognition/CaffeProxy.h>
+#endif
+
 #include <dirent.h>
 #include <yaml-cpp/yaml.h>
 #include <pcl/io/pcd_io.h>
@@ -54,7 +58,7 @@ void readClassLabel(std::string obj_file_path,
   cv::FileNode classesNode = fs["classes"];
   cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
   for(; it != it_end; ++it) {
-    classes.push_back((std::string)*it);
+    classes.push_back(static_cast<std::string>(*it));
   }
 #endif
   if(classes.empty()) {
@@ -70,7 +74,7 @@ void readClassLabel(std::string obj_file_path,
       cv::FileNode subClassesNode = fs[c];
       cv::FileNodeIterator it = subClassesNode.begin(), it_end = subClassesNode.end();
       for(; it != it_end; ++it) {
-        subclasses.push_back((std::string)*it);
+        subclasses.push_back(static_cast<std::string>(*it));
       }
 #endif
       //To set the map between string and double classlabel
@@ -117,14 +121,14 @@ void readClassLabelWU(std::string obj_file_path, std::vector <std::pair < string
   cv::FileNode classesNode = fs["classes"];
   cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
   for(; it != it_end; ++it) {
-    classes.push_back((std::string)*it);
+    classes.push_back(static_cast<std::string>(*it));
   }
 #endif
   if(classes.empty()) {
     std::cout << "Object file has no classes defined" << std::endl;
   }
   else {
-    for(int i = 0; i < classes.size(); i++) {
+    for(uint16_t i = 0; i < classes.size(); i++) {
       double clslabel = clslabel + 1;
       objectToClassLabelMap.push_back(std::pair< std::string, float >(classes[i], clslabel));
       std::vector<std::string> subclasses;
@@ -135,11 +139,11 @@ void readClassLabelWU(std::string obj_file_path, std::vector <std::pair < string
       cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
 
       for(; it != it_end; ++it) {
-        classes.push_back((std::string)*it);
+        classes.push_back(static_cast<std::string>(*it));
       }
 #endif
       if(!subclasses.empty())
-        for(int j = 0; j < subclasses.size(); j++) {
+        for(uint32_t j = 0; j < subclasses.size(); j++) {
 
           if(j == 0) {
             objectToLabelTest.push_back(std::pair< std::string, float >(subclasses[j] , clslabel));
@@ -153,19 +157,19 @@ void readClassLabelWU(std::string obj_file_path, std::vector <std::pair < string
   fs.release();
   if(!objectToClassLabelMap.empty()) {
     std::cout << "objectToClassLabel:" << std::endl;
-    for(int i = 0; i < objectToClassLabelMap.size(); i++) {
+    for(uint32_t i = 0; i < objectToClassLabelMap.size(); i++) {
       std::cout << objectToClassLabelMap[i].first << "::" << objectToClassLabelMap[i].second << std::endl;
     }
   }
   if(!objectToLabelTest.empty()) {
     std::cout << "objectToLabelTest:" << std::endl;
-    for(int i = 0; i < objectToLabelTest.size(); i++) {
+    for(uint32_t i = 0; i < objectToLabelTest.size(); i++) {
       std::cout << objectToLabelTest[i].first << "::" << objectToLabelTest[i].second << std::endl;
     }
   }
   if(!objectToLabelTrain.empty()) {
     std::cout << "objectToLabelTrain:" << std::endl;
-    for(int i = 0; i < objectToLabelTrain.size(); i++) {
+    for(uint32_t i = 0; i < objectToLabelTrain.size(); i++) {
       std::cout << objectToLabelTrain[i].first << "::" << objectToLabelTrain[i].second << std::endl;
     }
   }
@@ -176,7 +180,7 @@ void getParentDir(std::string path_storage , std::vector<std::string> &updir_wu_
   DIR *dir = opendir((path_storage).c_str());
   if(dir) {
     struct dirent *ent;
-    while((ent = readdir(dir)) != NULL) {
+    while((ent = readdir(dir)) != nullptr) {
       updir_wu_folder.push_back(ent->d_name);
 
     }
@@ -259,7 +263,7 @@ void getFiles(const std::string &resourchPath,
     std::cout << "pathToObj:" << pathToObj << std::endl;
     classdp = opendir(pathToObj.c_str());
 
-    if(classdp == NULL) {
+    if(classdp == nullptr) {
       std::cout << "<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
       std::cout << "FOLDER DOES NOT EXIST: " << pathToObj << std::endl;
       std::cout << "<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
@@ -268,7 +272,7 @@ void getFiles(const std::string &resourchPath,
       continue;
     }
 
-    while((classdirp = readdir(classdp)) != NULL) {
+    while((classdirp = readdir(classdp)) != nullptr) {
       if(classdirp->d_type != DT_REG) {
         continue;
       }
@@ -296,7 +300,7 @@ void extractPCLDescriptors(std::string descriptorType,
   for(std::map<double, std::vector<std::string> >::const_iterator it = modelFiles.begin();
       it != modelFiles.end(); ++it) {
     std::cerr << it->first << std::endl;
-    for(int i = 0; i < it->second.size(); ++i) {
+    for(uint32_t i = 0; i < it->second.size(); ++i) {
       std::cerr << it->second[i] << std::endl;
       pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
       pcl::io::loadPCDFile(it->second[i], *cloud);
@@ -350,7 +354,7 @@ void extractPCLDescriptors(std::string descriptorType,
   std::cerr << featDescription << extract_features.size() << std::endl;
 }
 
-// To extract the CNN and VGG16 features.........................................
+#ifdef WITH_CAFFE
 void extractCaffeFeature(std::string featType,
                          const  std::map<double, std::vector<std::string> > &modelFiles,
                          std::string resourcesPackagePath,
@@ -400,6 +404,7 @@ void extractCaffeFeature(std::string featType,
   }
   std::cerr << featDescription << caffe_features.size() << std::endl;
 }
+#endif
 
 // To split the instance dataset into train and and test dataset..............................
 void splitDataset(std::vector<std::pair<double, std::vector<float> > > features,
@@ -407,8 +412,8 @@ void splitDataset(std::vector<std::pair<double, std::vector<float> > > features,
                   std::vector<std::pair<double, std::vector<float> > > &output_test)
 {
   //every fourth descriptor stored to vector output_test
-  for(int i = 0; i < features.size() / 4; i++) {
-    for(int j = 0; j < 3; j++) {
+  for(uint32_t i = 0; i < features.size() / 4; i++) {
+    for(uint8_t j = 0; j < 3; j++) {
       output_train.push_back(features[j + 4 * i]);
     }
     output_test.push_back(features[3 + 4 * i]);
@@ -569,19 +574,26 @@ int main(int argc, char **argv)
   if(dataset_name == "IAI") {
     if(feat == "CNN") {
       std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
-
       // To read all .png files from the storage folder...........
       getFiles(resourcePath, storageInput, objectToLabel, model_files_all, "_crop.png", dataset_name);
-
-      // To calculate VFH descriptors..................................
+#if WITH_CAFFE
       extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
+#else
+    std::cerr<<"Caffe not available."<<std::endl;
+    exit(1);
+#endif
     }
     else if(feat == "VGG16") {
       std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
       // To read all .png files from the storage folder...........
       getFiles(resourcePath, storageInput, objectToLabel, model_files_all, "_crop.png", dataset_name);
       // To calculate VFH descriptors..................................
+#if WITH_CAFFE
       extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
+ #else
+      std::cerr<<"Caffe not available."<<std::endl;
+      exit(1);
+#endif
     }
     else if(feat == "VFH") {
       std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
@@ -615,10 +627,16 @@ int main(int argc, char **argv)
       getFiles(resourcePath, storageInput, objectToLabel_train, model_files_train, "_crop.png", dataset_name);
       // To read .png files from the storage folder...........
       getFiles(resourcePath, storageInput, objectToLabel_test, model_files_test, "_crop.png", dataset_name);
+
+#ifdef WITH_CAFFE
       // To calculate CNN features..................................
       extractCaffeFeature(feat , model_files_train, resourcePath, descriptors_train);
       // To calculate CNN features..................................
       extractCaffeFeature(feat, model_files_test, resourcePath, descriptors_test);
+#else
+      std::cerr<<"Caffe not available."<<std::endl;
+      exit(1);
+#endif
     }
     else if(feat == "VFH" || feat == "CVFH") {
       std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
@@ -646,15 +664,25 @@ int main(int argc, char **argv)
       std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
       // To read all .png files from the storage folder...........
       getFiles(resourcePath, storageInput, objectToLabel, model_files_all, "_crop.png", dataset_name);
+#ifdef WITH_CAFFE
       // To calculate VFH descriptors..................................
       extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
+#else
+      std::cerr<<"Caffe not available."<<std::endl;
+      exit(1);
+#endif
     }
     else if(feat == "VGG16") {
       std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
       // To read all .png files from the storage folder...........
       getFiles(resourcePath, storageInput, objectToLabel, model_files_all, "_crop.png", dataset_name);
+#ifdef WITH_CAFFE
       // To calculate VFH descriptors..................................
       extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
+#else
+      std::cerr<<"Caffe not available."<<std::endl;
+      exit(1);
+#endif
     }
     else if(feat == "VFH") {
       std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;

@@ -10,7 +10,7 @@ endif(simtrack_nodes_FOUND)
 
 find_package(json_prolog QUIET)
 if(json_prolog_FOUND)
-    message(STATUS "OPTIONAL MODULE simtrack FOUND")
+    message(STATUS "OPTIONAL MODULE json_prolog FOUND")
     set(OPTIONAL_json_prolog json_prolog)
 endif(json_prolog_FOUND)
 
@@ -21,6 +21,7 @@ find_package(RapidJSON REQUIRED)
 
 
 if(Caffe_FOUND)
+    add_definition(-DWITH_CAFFE)
     message(STATUS "OPTIONAL MODULE Caffe FOUND")
     set(OPTIONAL_Caffe Caffe)
     add_definitions( -DCAFFE_FOUND ${Caffe_DEFINITIONS})
@@ -100,26 +101,27 @@ else(aruco_FOUND)
 endif(aruco_FOUND)
 
 if(Caffe_FOUND)
-    add_executable(featureExtractor src/tools/feature_extractor.cpp)
-    target_link_libraries(featureExtractor
-        ${PCL_LIBRARIES}
-        ${catkin_LIBRARIES}
-        ${OpenCV_LIBRARIES}
-        ${Boost_LIBRARIES}
-        ${Caffe_LIBRARIES}
-        )
-    rs_add_library(rs_caffeClassification src/CaffeClassificationAnnotator.cpp)
-    target_link_libraries(rs_caffeClassification
+  rs_add_library(rs_caffeClassification src/CaffeClassificationAnnotator.cpp)
+  target_link_libraries(rs_caffeClassification
         ${catkin_LIBRARIES}
         ${Caffe_LIBRARIES}
         )
-    rs_add_library(rs_deCafClassifier src/DeCafClassifier.cpp)
-    target_link_libraries(rs_deCafClassifier
+  rs_add_library(rs_deCafClassifier src/DeCafClassifier.cpp)
+  target_link_libraries(rs_deCafClassifier
         ${catkin_LIBRARIES}
         ${PCL_LIBRARIES}
         ${Caffe_LIBRARIES}
         )
 endif(Caffe_FOUND)
+
+add_executable(featureExtractor src/tools/feature_extractor.cpp)
+target_link_libraries(featureExtractor
+	${PCL_LIBRARIES}
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${Caffe_LIBRARIES}
+)
 
 
 add_library(rs_classifiers src/classifiers/RSClassifier.cpp
