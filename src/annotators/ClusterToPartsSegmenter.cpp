@@ -269,7 +269,7 @@ private:
     std::string obj_to_inspect = "";
     if(cas.getFS("QUERY", query))
     {
-      std::string queryAsString = query.asJson();
+      std::string queryAsString = query.query();
       if(queryAsString != "")
       {
         rapidjson::Document doc;

@@ -112,8 +112,8 @@ public:
     std::string jsonQuery;
     if(cas.getFS("QUERY", qs))
     {
-      jsonQuery = qs.asJson();
-      outWarn("json query: " << qs.asJson());
+      jsonQuery = qs.query();
+      outWarn("json query: " << qs.query());
     }
     else
     {

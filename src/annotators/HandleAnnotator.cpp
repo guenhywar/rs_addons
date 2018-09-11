@@ -276,7 +276,8 @@ public:
       }
 
       rs::Detection detection = rs::create<rs::Detection>(tcas);
-      detection.name.set(handles[min_dist_index].name());
+//      detection.name.set(handles[min_dist_index].name());
+      detection.name.set("handle");
       detection.source.set("HandleAnnotator");
       detection.confidence.set(1.0);
       c.annotations.append(detection);

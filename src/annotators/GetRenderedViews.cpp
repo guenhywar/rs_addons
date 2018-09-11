@@ -306,7 +306,7 @@ public:
     std::string jsonQuery;
     if(cas.getFS("QUERY", qs))
     {
-      jsonQuery = qs.asJson();
+      jsonQuery = qs.query();
       outDebug("json query: " << jsonQuery);
     }
     else
