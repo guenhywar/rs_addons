@@ -1,0 +1,12 @@
+annotator:
+  implementation: rs_knnAnnotator
+  name: KnnAnnotator
+capabilities:
+  inputs: []
+  outputs: []
+parameters:
+  actual_class_label: IAI_CNN_ClassLabel_unreal
+  default_k: 3
+  set_mode: CL
+  trainKNNLabel_matrix: IAI_CNN_MatTrainLabel_unreal
+  trainKNN_matrix: IAI_CNN_MatTrain_unreal

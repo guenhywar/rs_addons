@@ -1,0 +1,10 @@
+annotator:
+  implementation: rs_rfAnnotator
+  name: RfAnnotator
+capabilities:
+  inputs: []
+  outputs: []
+parameters:
+  actual_class_label: IAI_CNN_ClassLabel_objects
+  set_mode: CL
+  trained_model_name: IAI_CNN_rsrfModel_objects

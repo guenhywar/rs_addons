@@ -1,0 +1,10 @@
+annotator:
+  implementation: rs_handleAnnotator
+  name: HandleAnnotator
+capabilities:
+  inputs:
+  - rs.pcl.PointCloud
+  - rs.pcl.NormalsCloud
+  outputs:
+  - rs.annotation.Detection
+parameters: {}

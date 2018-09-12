@@ -1,0 +1,10 @@
+annotator:
+  implementation: rs_svmAnnotator
+  name: SvmAnnotator
+capabilities:
+  inputs: []
+  outputs: []
+parameters:
+  actual_class_label: IAI_VFH_ClassLabel_breakfast1shape
+  set_mode: CL
+  trained_model_name: IAI_VFH_rssvmModel_breakfast1shape

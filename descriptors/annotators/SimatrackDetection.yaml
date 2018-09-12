@@ -1,0 +1,8 @@
+annotator:
+  description: adds a detection annotation SIMTRACK detector from KTH
+  implementation: rs_simtrack
+  name: SimtrackDetection
+capabilities:
+  inputs: []
+  outputs: []
+parameters: {}
