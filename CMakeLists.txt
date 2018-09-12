@@ -21,7 +21,7 @@ find_package(RapidJSON REQUIRED)
 
 
 if(Caffe_FOUND)
-    add_definition(-DWITH_CAFFE)
+    add_definitions(-DWITH_CAFFE)
     message(STATUS "OPTIONAL MODULE Caffe FOUND")
     set(OPTIONAL_Caffe Caffe)
     add_definitions( -DCAFFE_FOUND ${Caffe_DEFINITIONS})

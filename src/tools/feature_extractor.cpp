@@ -175,21 +175,6 @@ void readClassLabelWU(std::string obj_file_path, std::vector <std::pair < string
   }
 }
 
-void getParentDir(std::string path_storage, std::vector<std::string> &updir_wu_folder)
-{
-  DIR *dir = opendir((path_storage).c_str());
-  if(dir) {
-    struct dirent *ent;
-    while((ent = readdir(dir)) != nullptr) {
-      updir_wu_folder.push_back(ent->d_name);
-
-    }
-  }
-  else {
-    std::cout << "Intermediate directory folder is not found" << std::endl;
-  }
-}
-
 //To read all the objects from rs_resources/objects_dataset folder.....................
 void getFiles(const std::string &resourchPath,
               std::string storage_fol,
@@ -200,65 +185,31 @@ void getFiles(const std::string &resourchPath,
   std::string path_to_data = resourchPath + "/objects_dataset/object_data/";
   std::cerr << "______________________" << std::endl;
   std::cerr << path_to_data << std::endl;
+
   DIR *classdp;
   struct dirent *classdirp;
   size_t pos;
   for(auto const &p : object_label) {
     std::string pathToObj;
-    if(dataset_input == "IAI") {
-      if(!bfs::exists(bfs::path(path_to_data + storage_fol))) {
-        std::cout << "*********************************************************************************************" << std::endl;
-        std::cerr << "Input images storage folder for " << dataset_input << " " << "dataset does not exist " << std::endl;
-        std::cerr << "You have selected storage folder (" << storage_fol << "), which does not exist " << std::endl;
-        std::cerr << "The storage folder should be in path:" << path_to_data << std::endl << std::endl;
-        std::exit(0);
-      }
-      pathToObj = path_to_data + storage_fol + '/' + p.first;
-    }
-    else if(dataset_input == "WU") {
-      if(!bfs::exists(bfs::path(path_to_data + storage_fol))) {
-        std::cout << "*********************************************************************************************" << std::endl;
-        std::cerr << "Input images storage folder for " << dataset_input << " " << "dataset does not exist " << std::endl;
-        std::cerr << "You have selected storage folder(" << storage_fol << "), which does not exist " << std::endl;
-        std::cerr << "The storage folder should be in path:" << path_to_data << std::endl << std::endl;
-        std::exit(0);
-      }
-      std::vector<std::string> updir_wu;
-      getParentDir(path_to_data + storage_fol, updir_wu);
-      for(auto const &m : updir_wu) {
-        if(bfs::exists(bfs::path(path_to_data + storage_fol + '/' + m + '/' + p.first))) {
-          pathToObj = path_to_data + storage_fol + '/' + m + '/' + p.first;
+
+    boost::filesystem::path bPath(path_to_data);
+
+    try {
+      boost::filesystem::recursive_directory_iterator dIt(bPath, boost::filesystem::symlink_option::recurse), end;
+      while(dIt != end) {
+        if(boost::filesystem::is_directory(dIt->path())) {
+
+          if(dIt->path().filename().string() == p.first) {
+            pathToObj = dIt->path().string();
+            break;
+          }
         }
+        dIt++;
       }
     }
-    else if(dataset_input == "BOTH") {
-      std::vector<std::string> split_store_folder;
-      boost::split(split_store_folder, storage_fol, boost::is_any_of("/"));
-
-      if(!bfs::exists(bfs::path(path_to_data + split_store_folder[0])) ||
-         !bfs::exists(bfs::path(path_to_data + split_store_folder[1]))) {
-        std::cout << "*********************************************************************************************" << std::endl;
-        std::cerr << "Input images storage folders " << storage_fol << " " << "for" << dataset_input << " " << "datasets do not exist" << std::endl;
-        std::cerr << "You have to select parameter (inputStorage) as: IAIstorage/WUstorage  folders name accordingly." << std::endl;
-        std::cerr << "The storage folders should be in path:" << path_to_data << std::endl << std::endl;
-
-        std::exit(0);
-      }
-
-      if(bfs::exists(bfs::path(path_to_data + split_store_folder[0] + '/' + p.first))) {
-        pathToObj = path_to_data + split_store_folder[0] + '/' + p.first;
-      }
-      else {
-        std::vector<std::string> updir_wuOne;
-        getParentDir(path_to_data + split_store_folder[1], updir_wuOne);
-        for(auto const &n : updir_wuOne) {
-          if(bfs::exists(bfs::path(path_to_data + split_store_folder[1] + '/' + n + '/' + p.first)))
-            pathToObj = path_to_data + split_store_folder[1] + '/' + n + '/' + p.first;
-        }
-      }
+    catch(boost::filesystem::filesystem_error err) {
+      std::cerr<<err.what()<<std::endl;
     }
-    else
-      std::cout << dataset_input << "is a Wrong dataset_name" << std::endl;
 
     std::cout << "pathToObj:" << pathToObj << std::endl;
     classdp = opendir(pathToObj.c_str());
@@ -536,7 +487,6 @@ int main(int argc, char **argv)
     std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
     // To read all .png files from the storage folder...........
     getFiles(resourcePath, storageInput, objectToLabel, model_files_all, "_crop.png", dataset_name);
-
     extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
 #else
     std::cerr << "Caffe not available." << std::endl;
@@ -554,6 +504,7 @@ int main(int argc, char **argv)
     std::cerr << "Please select one of the supported feature descriptors (CNN, VGG16, VFH, CVFH)" << std::endl;
     return EXIT_FAILURE;
   }
+
   // To split all the calculated VFH descriptors (descriptors_all) into train and test data for
   // the classifier. Here evey fourth element of vector (descriptors_all) is considered as test data
   // and rest are train data
