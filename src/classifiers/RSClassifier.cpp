@@ -74,25 +74,22 @@ void RSClassifier::getLabels(const std::string path,  std::map<std::string, doub
 }
 
 // To read the descriptors matrix and it's label from /rs_resources/objects_dataset/extractedFeat folder...........
-void RSClassifier::readDescriptorAndLabel(std::string matrix_name, std::string label_name,
+void RSClassifier::readFeaturesFromFile(std::string data_file_path, std::string label_name,
                                           cv::Mat &des_matrix, cv::Mat &des_label)
 {
   cv::FileStorage fs;
   std::string packagePath = ros::package::getPath("rs_resources") + '/';
   std::string savePath = "objects_dataset/extractedFeat/";
 
-  if(!boost::filesystem::exists(packagePath + savePath+ matrix_name+".yaml")||
-     !boost::filesystem::exists(packagePath + savePath+ label_name+".yaml"))
+  if(!boost::filesystem::exists(data_file_path))
   {
-    outError( matrix_name <<" or "<<label_name <<" in path  ( " << packagePath + savePath << " ) does not exist. please check" << std::endl);
+    outError( data_file_path <<" does not exist. please check" << std::endl);
   }
   else
   {
-    fs.open(packagePath + savePath + matrix_name + ".yaml", cv::FileStorage::READ);
-    fs[matrix_name] >> des_matrix;
-
-    fs.open(packagePath + savePath + label_name + ".yaml", cv::FileStorage::READ);
-    fs [label_name] >> des_label;
+    fs.open(data_file_path, cv::FileStorage::READ);
+    fs["descriptors"] >> des_matrix;
+    fs["label"] >> des_label;
   }
 }
 
@@ -151,12 +148,13 @@ std::string RSClassifier::saveTrained(std::string trained_file_name)
 
   if(!boost::filesystem::exists(packagePath + save_train))
   {
-    outError("Folder called (trainedData) is not found to save or load the generated trained model. "
-             " Please create the folder in rs_addons/ and name it as trainedData, then run the annotator again "<<std::endl);
+    boost::filesystem::create_directory(boost::filesystem::path(packagePath+save_train));
+//    outError("Folder called (trainedData) is not found to save or load the generated trained model. "
+//             " Please create the folder in rs_addons/ and name it as trainedData, then run the annotator again "<<std::endl);
   }
   else
   {
-    a = packagePath + save_train + trained_file_name + ".xml";
+    a = packagePath + save_train + "classifier.xml";
   }
   return a;
 }

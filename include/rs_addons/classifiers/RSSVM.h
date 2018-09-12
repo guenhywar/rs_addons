@@ -46,7 +46,7 @@ public:
 
   void RsAnnotation (uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi);
 
-  ~ RSSVM();
+  ~RSSVM();
 };
 
 #endif

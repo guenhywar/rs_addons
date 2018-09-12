@@ -45,7 +45,7 @@ public:
 
   void getLabels(const std::string path,  std::map<std::string, double> &input_file);
 
-  void readDescriptorAndLabel(std::string matrix_name, std::string label_name, cv::Mat &des_matrix, cv::Mat &des_label);
+  void readFeaturesFromFile(std::string matrix_name, std::string label_name, cv::Mat &des_matrix, cv::Mat &des_label);
   
   //save model file
   std::string saveTrained(std::string trained_file_name);

@@ -36,7 +36,7 @@ void RSGBT:: trainModel(std::string train_matrix_name, std::string train_label_n
 {
   cv::Mat train_matrix;
   cv::Mat train_label;
-  readDescriptorAndLabel(train_matrix_name, train_label_name, train_matrix, train_label);
+  readFeaturesFromFile(train_matrix_name, train_label_name, train_matrix, train_label);
   std::cout << "size of train matrix:" << train_matrix.size() << std::endl;
   std::cout << "size of train label:" << train_label.size() << std::endl;
   std::string pathToSaveModel= saveTrained(trained_file_name);

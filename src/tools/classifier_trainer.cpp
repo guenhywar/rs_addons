@@ -39,14 +39,16 @@ int main(int argc, char **argv)
              "classifier to train: [SVM|RF|GBT|KNN]")
             ("input,i", bpo::value<std::string>(&train_data_name)->default_value(""),
              "enter input features file")
-            ("labels,l", bpo::value<std::string>(&train_label_name)->default_value(""),
-             "labels of the data: [IAI|WU|BOTH]")
             ("out,o", bpo::value<std::string>(&trained_model_name)->default_value("classifier.model"),
              "output file name");
     bpo::variables_map vm;
     bpo::store(bpo::parse_command_line(argc, argv, desc), vm);
     bpo::notify(vm);
 
+    if(vm.count("help")) {
+      std::cout << desc << "\n";
+      return 1;
+    }
 
     outInfo("Name of the loaded files for classifier trainning are:"<<std::endl);
     outInfo("classifier_type:"<<classifier_type<<std::endl);

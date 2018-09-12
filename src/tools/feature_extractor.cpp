@@ -94,14 +94,14 @@ void readClassLabel(std::string obj_file_path,
   fs.release();
   if(!objectToClassLabelMap.empty()) {
     std::cout << "objectToClassLabelMap:" << std::endl;
-    for(int i = 0; i < objectToClassLabelMap.size(); i++)
+    for(unsigned int i = 0; i < objectToClassLabelMap.size(); i++)
       std::cout << objectToClassLabelMap[i].first << "::" << objectToClassLabelMap[i].second << std::endl;
   }
   std::cout << std::endl;
 
   if(!objectToLabel.empty()) {
     std::cout << "objectToLabel:" << std::endl;
-    for(int i = 0; i < objectToLabel.size(); i++)
+    for(unsigned int i = 0; i < objectToLabel.size(); i++)
       std::cout << objectToLabel[i].first << "::" << objectToLabel[i].second << std::endl;
 
   }

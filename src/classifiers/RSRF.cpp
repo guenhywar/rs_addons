@@ -36,7 +36,7 @@ void RSRF:: trainModel(std::string train_matrix_name, std::string train_label_na
 {
   cv::Mat train_matrix;
   cv::Mat train_label;
-  readDescriptorAndLabel(train_matrix_name, train_label_name, train_matrix, train_label);
+  readFeaturesFromFile(train_matrix_name, train_label_name, train_matrix, train_label);
   std::cout << "size of train matrix:" << train_matrix.size() << std::endl;
   std::cout << "size of train label:" << train_label.size() << std::endl;
 
@@ -151,7 +151,7 @@ void RSRF::classify(std::string trained_file_name_saved, std::string test_matrix
 {
   cv::Mat test_matrix;
   cv::Mat test_label;
-  readDescriptorAndLabel(test_matrix_name, test_label_name, test_matrix, test_label);
+  readFeaturesFromFile(test_matrix_name, test_label_name, test_matrix, test_label);
   std::cout << "size of test matrix :" << test_matrix.size() << std::endl;
   std::cout << "size of test label" << test_label.size() << std::endl;
 
