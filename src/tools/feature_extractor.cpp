@@ -177,27 +177,24 @@ void readClassLabelWU(std::string obj_file_path, std::vector <std::pair < string
 
 //To read all the objects from rs_resources/objects_dataset folder.....................
 void getFiles(const std::string &resourchPath,
-              std::string storage_fol,
               std::vector <std::pair < string, double> > object_label,
               std::map<double, std::vector<std::string> > &modelFiles,
-              std::string file_extension, std::string dataset_input)
+              std::string file_extension)
 {
   std::string path_to_data = resourchPath + "/objects_dataset/object_data/";
   std::cerr << "______________________" << std::endl;
   std::cerr << path_to_data << std::endl;
 
-  DIR *classdp;
-  struct dirent *classdirp;
   size_t pos;
   for(auto const &p : object_label) {
-    std::string pathToObj;
-
-    boost::filesystem::path bPath(path_to_data);
+    std::string pathToObj("");
+    std::cout << p.first;
+    bfs::path bPath(path_to_data);
 
     try {
-      boost::filesystem::recursive_directory_iterator dIt(bPath, boost::filesystem::symlink_option::recurse), end;
+      bfs::recursive_directory_iterator dIt(bPath, bfs::symlink_option::recurse), end;
       while(dIt != end) {
-        if(boost::filesystem::is_directory(dIt->path())) {
+        if(bfs::is_directory(dIt->path())) {
 
           if(dIt->path().filename().string() == p.first) {
             pathToObj = dIt->path().string();
@@ -207,31 +204,32 @@ void getFiles(const std::string &resourchPath,
         dIt++;
       }
     }
-    catch(boost::filesystem::filesystem_error err) {
-      std::cerr<<err.what()<<std::endl;
+    catch(bfs::filesystem_error err) {
+      std::cerr << err.what() << std::endl;
     }
 
     std::cout << "pathToObj:" << pathToObj << std::endl;
-    classdp = opendir(pathToObj.c_str());
-
-    if(classdp == nullptr) {
+    if(pathToObj == "") {
       std::cout << "<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
-      std::cout << "FOLDER DOES NOT EXIST: " << pathToObj << std::endl;
+      std::cout << "NO PATH FOUND TO FOLDER WITH THE NAME: " << p.first << std::endl;
       std::cout << "<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
-      std::cerr << "Wrong combination of storageInput( " << storage_fol << " ) and dataset_name ( " << dataset_input << " ) parameter is chosen" << std::endl;
-      std::cerr << "Please check the help menu" << std::endl;
-      continue;
+      exit(1);
     }
-
-    while((classdirp = readdir(classdp)) != nullptr) {
-      if(classdirp->d_type != DT_REG) {
-        continue;
+    try {
+      boost::filesystem::directory_iterator objDirIt(pathToObj);
+      while(objDirIt != boost::filesystem::directory_iterator{}) {
+        if(boost::filesystem::is_regular_file(objDirIt->path())) {
+          std::string filename = objDirIt->path().string();
+          pos = filename.rfind(file_extension.c_str());
+          if(pos != std::string::npos) {
+              modelFiles[p.second].push_back(objDirIt->path().string());
+          }
+        }
+        objDirIt++;
       }
-      std::string filename = classdirp->d_name;
-      pos = filename.rfind(file_extension.c_str());
-      if(pos != std::string::npos) {
-        modelFiles[p.second].push_back(pathToObj + '/' + filename);
-      }
+    }
+    catch(bfs::filesystem_error err) {
+      std::cerr << err.what() << std::endl;
     }
   }
 
@@ -246,7 +244,6 @@ void extractPCLDescriptors(std::string descriptorType,
                            const std::map<double, std::vector<std::string> > &modelFiles,
                            std::vector<std::pair<double, std::vector<float> > > &extract_features)
 {
-
   std::string featDescription;
   for(std::map<double, std::vector<std::string> >::const_iterator it = modelFiles.begin();
       it != modelFiles.end(); ++it) {
@@ -320,10 +317,10 @@ void extractCaffeFeature(std::string featType,
     CAFFE_TRAINED_FILE = "/caffe/models/bvlc_reference_caffenet/VGG_ILSVRC_16_layers.caffemodel";
     featDescription = "VGG16 feature size :";
   }
-  else if(featType == "CNN") {
+  else if(featType == "BVLC_REF") {
     CAFFE_MODEL_FILE = "/caffe/models/bvlc_reference_caffenet/deploy.prototxt";
     CAFFE_TRAINED_FILE = "/caffe/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel";
-    featDescription = "CNN feature size :";
+    featDescription = "BVLC_REF feature size :";
   }
   else {
     std::cerr << "CAFFE_MODEL_FILE and CAFFE_TRAINED_FILE are not found" << std::endl;
@@ -382,38 +379,37 @@ void descriptorsSplit(std::vector<std::pair<double, std::vector<float> > > featu
 }
 
 // To save the train and test data in cv::Mat format in folder /rs_resource/extractedFeat
-void saveDatasets(std::vector<std::pair<double, std::vector<float> > > train_dataset,
+void saveDatasets(std::vector<std::pair<double, std::vector<float> > > data,
                   std::string descriptor_name,
-                  std::string dataset_name, std::string xml_filename, std::string savePathToOutput)
+                  std::string split_filename, std::string savePathToOutput)
 {
-  cv::Mat descriptors_train(train_dataset.size(), train_dataset[0].second.size(), CV_32F);
-  cv::Mat label_train(train_dataset.size(), 1, CV_32F);
+  if(data.size()==0) return;
+  cv::Mat descriptors_train(data.size(), data[0].second.size(), CV_32F);
+  cv::Mat label_train(data.size(), 1, CV_32F);
 
 
-  for(size_t i = 0; i <  train_dataset.size(); ++i) {
-    label_train.at<float>(i, 0) = static_cast<float>(train_dataset[i].first);
+  for(size_t i = 0; i <  data.size(); ++i) {
+    label_train.at<float>(i, 0) = static_cast<float>(data[i].first);
 
-    for(size_t j = 0; j <  train_dataset[i].second.size(); ++j) {
-      descriptors_train.at<float>(i, j) =  train_dataset[i].second[j];
+    for(size_t j = 0; j <  data[i].second.size(); ++j) {
+      descriptors_train.at<float>(i, j) =  data[i].second[j];
     }
   }
   //To save file in disk...........................................................
   cv::FileStorage fs;
   // To save the train data.................................................
-  fs.open(savePathToOutput + dataset_name + '_' + descriptor_name + '_' + "MatTrain" + '_' + xml_filename + ".yaml", cv::FileStorage::WRITE);
-  fs << dataset_name + '_' + descriptor_name + '_' + "MatTrain" + '_' + xml_filename << descriptors_train;
-  fs.release();
-  fs.open(savePathToOutput + dataset_name + '_' + descriptor_name + '_' + "MatTrainLabel" + '_' + xml_filename + ".yaml", cv::FileStorage::WRITE);
-  fs << dataset_name + '_' + descriptor_name + '_' + "MatTrainLabel" + '_' + xml_filename << label_train;
+  fs.open(savePathToOutput + descriptor_name + '_' + "data" + '_' + split_filename + ".yaml", cv::FileStorage::WRITE);
+  fs << "label" << label_train;
+  fs << "descriptors" << descriptors_train;
   fs.release();
 
   std::cout << "extracted feautres should be found in path (" << savePathToOutput << ")" << std::endl;
 }
 
 void saveObjectToLabels(std::vector <std::pair < string, double> > input_file, std::string descriptor_name,
-                        std::string dataset_name, std::string xml_filename, std::string savePathToOutput)
+                        std::string xml_filename, std::string savePathToOutput)
 {
-  std::ofstream file((savePathToOutput + dataset_name + '_' + descriptor_name + '_' + "ClassLabel" + '_' + xml_filename + ".txt").c_str());
+  std::ofstream file((savePathToOutput + descriptor_name + '_' + "ClassLabel" + '_' + xml_filename + ".txt").c_str());
   for(auto p : input_file) {
     file << p.first << ":" << p.second << endl;
   }
@@ -423,17 +419,13 @@ void saveObjectToLabels(std::vector <std::pair < string, double> > input_file, s
 int main(int argc, char **argv)
 {
   po::options_description desc("Allowed options");
-  std::string split_name, storageInput, feat, dataset_name;
+  std::string split_name, feat;
   desc.add_options()
   ("help,h", "Print help messages")
   ("split,s", po::value<std::string>(& split_name)->default_value("breakfast3"),
    "enter the split file name")
-  ("storageInput,i", po::value<std::string>(& storageInput)->default_value("partial_views"),
-   "enter input storage folder name. If want to use both storages at once provide folders name as iaiStorageFolder/wuStorageFolder")
-  ("datasets,d", po::value<std::string>(&dataset_name)->default_value("IAI"),
-   "choose the dataset: [IAI|WU|BOTH]")
-  ("feature,f", po::value<std::string>(&feat)->default_value("CNN"),
-   "choose feature to extract: [CNN|VGG16|VFH|CVFH]");
+  ("feature,f", po::value<std::string>(&feat)->default_value("BVLC_REF"),
+   "choose feature to extract: [BVLC_REF|VGG16|VFH|CVFH]");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
@@ -482,11 +474,11 @@ int main(int argc, char **argv)
   //Extract the feat descriptors
   std::vector<std::pair<double, std::vector<float> > > descriptors_all;
 
-  if(feat == "CNN" || feat == "VGG16") {
+  if(feat == "BVLC_REF" || feat == "VGG16") {
 #ifdef WITH_CAFFE
-    std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
+    std::cout << "Calculation starts with :" << "::" << feat << std::endl;
     // To read all .png files from the storage folder...........
-    getFiles(resourcePath, storageInput, objectToLabel, model_files_all, "_crop.png", dataset_name);
+    getFiles(resourcePath, objectToLabel, model_files_all, "_crop.png");
     extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
 #else
     std::cerr << "Caffe not available." << std::endl;
@@ -494,14 +486,14 @@ int main(int argc, char **argv)
 #endif
   }
   else if(feat == "VFH" || feat == "CVFH") {
-    std::cout << "Calculation starts with :" << dataset_name << "::" << feat << std::endl;
+    std::cout << "Calculation starts with :" << "::" << feat << std::endl;
     // To read all .cpd files from the storage folder...........
-    getFiles(resourcePath, storageInput, objectToLabel, model_files_all, ".pcd", dataset_name);
+    getFiles(resourcePath, objectToLabel, model_files_all, ".pcd");
     // To calculate VFH descriptors..................................
     extractPCLDescriptors(feat, model_files_all, descriptors_all);
   }
   else {
-    std::cerr << "Please select one of the supported feature descriptors (CNN, VGG16, VFH, CVFH)" << std::endl;
+    std::cerr << "Please select one of the supported feature descriptors (BVLC_REF, VGG16, VFH, CVFH)" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -510,12 +502,11 @@ int main(int argc, char **argv)
   // and rest are train data
   //splitDataset(descriptors_all, descriptors_all_train, descriptors_all_test);
   // To save the train and test data in path /rs_resources/objects_dataset/extractedFeat
-  saveDatasets(descriptors_all, feat, dataset_name, split_name, savePathToOutput);
-
-
+  saveDatasets(descriptors_all, feat, split_name, savePathToOutput);
 
   //To save the string class labels in type double in folder rs_resources/objects_dataset/extractedFeat
-  saveObjectToLabels(objectToClassLabelMap, feat, dataset_name, split_name, savePathToOutput);
+  saveObjectToLabels(objectToClassLabelMap, feat, split_name, savePathToOutput);
+
   std::cout << "Descriptors calculation is done" << std::endl;
   return 0;
 }

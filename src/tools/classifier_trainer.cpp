@@ -78,12 +78,14 @@ int main(int argc, char **argv)
         outInfo("Training with RSGBT is going on .......");
         gbtObject->trainModel(train_data_name ,train_label_name, trained_model_name);
     }
+    else if(classifier_type=="KNN")
+    {
+        outInfo("No need to train a KNN;");
+    }
     else
     {
         outError("Please select the correct classifier_type, which is either rssvm, rsrf, rsgbt, rsknn");
     }
-
     outInfo("Classifier training is Done !!!");
-
 }
 
