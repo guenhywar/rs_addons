@@ -518,8 +518,6 @@ int main(int argc, char **argv)
   std::cout << "Path to save the extracted feature : " << savePathToOutput << std::endl << std::endl;
 
   std::vector <std::pair < string, double> > objectToLabel;
-  std::vector <std::pair < string, double> > objectToLabel_train;
-  std::vector <std::pair < string, double> > objectToLabel_test;
   std::vector <std::pair < string, double> > objectToClassLabelMap;
 
   // To read the class label from .yaml file................
