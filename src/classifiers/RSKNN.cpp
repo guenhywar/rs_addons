@@ -34,8 +34,10 @@
 using namespace cv;
 
 //..............................k-Nearest Neighbor Classifier.........................................
-RSKNN::RSKNN()
+RSKNN::RSKNN(int K)
 {
+  knncalld = cv::ml::KNearest::create();
+  knncalld->setDefaultK(K);
 }
 
 void RSKNN:: trainModel(std::string train_matrix_name, std::string train_label_name, std::string train_label_n)
@@ -48,6 +50,12 @@ void RSKNN:: classify(std::string trained_file_name_saved, std::string test_matr
 
 void RSKNN::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_mat, double &det, double &confi)
 {
+}
+
+void RSKNN::loadModelFile(std::string pathToModelFile)
+{
+   readFeaturesFromFile(pathToModelFile, "", trainingData_, dataLabels_);
+   knncalld->train(trainingData_, cv::ml::ROW_SAMPLE, dataLabels_);
 }
 
 void RSKNN:: classifyKNN(std::string train_matrix_name, std::string train_label_name,
@@ -79,14 +87,6 @@ void RSKNN:: classifyKNN(std::string train_matrix_name, std::string train_label_
   //cv::Mat neighborResponses, bestResponse, distances;
 
 #elif CV_MAJOR_VERSION == 3
-  cv::Ptr<cv::ml::KNearest> knncalld = cv::ml::KNearest::create();
-
-  knncalld->setDefaultK(default_k);
-
-  //Train the classifier
-  //TODO: is it ROW_SAMPLE?
-  knncalld->train(train_matrix, cv::ml::ROW_SAMPLE, train_label);
-
   int k_max = knncalld->getDefaultK();
 #endif
 
@@ -117,54 +117,17 @@ void RSKNN:: classifyKNN(std::string train_matrix_name, std::string train_label_
   evaluation(actual_label, predicted_label, obj_classInDouble);
 }
 
-void RSKNN::classifyOnLiveDataKNN(std::string train_matrix_name, std::string train_label_name, int default_k, cv::Mat test_mat, double &det)
+double RSKNN::classifyOnLiveDataKNN(cv::Mat test_mat)
 {
-  //To load the train data................
-  cv::Mat train_matrix;
-  cv::Mat train_label;
-  readFeaturesFromFile(train_matrix_name, train_label_name, train_matrix, train_label);
-  std::cout << "size of train matrix:" << train_matrix.size() << std::endl;
-  std::cout << "size of train label:" << train_label.size() << std::endl;
-
-  //To load the test data and it's label.............................
-  std::cout << "size of test matrix :" << test_mat.size() << std::endl;
-
-#if CV_MAJOR_VERSION == 2
-  CvKNearest *knncalldc = new CvKNearest;
-
-  //Train the classifier...................................
-  knncalldc->train(train_matrix, train_label, cv::Mat(), false, default_k, false);
-
-  //To get the value of k.............
-  int k_max = knncalldc->get_max_k();
-  //cv::Mat neighborResponses, bestResponse, distances;
-
-  //double res = knnclsa->find_nearest(test_mat, default_k, bestResponse, neighborResponses, distances);
-
-  double res = knncalldc->find_nearest(test_mat, k_max);
-  std::cout << "prediction class is :" << res << std::endl;
-  det = res;
-#elif CV_MAJOR_VERSION == 3
-  cv::Ptr<cv::ml::KNearest> knncalldc = cv::ml::KNearest::create();
-
-  knncalldc->setDefaultK(default_k);
-
-  //Train the classifier
-  //TODO: is it ROW_SAMPLE?
-  knncalldc->train(train_matrix, cv::ml::ROW_SAMPLE, train_label);
-
-  int k_max = knncalldc->getDefaultK();
-
-  double res = knncalldc->findNearest(test_mat, k_max, cv::noArray());
-  std::cout << "prediction class is :" << res << std::endl;
-  det = res;
-#endif
+  int k_max = knncalld->getDefaultK();
+  double res = knncalld->findNearest(test_mat, k_max, cv::noArray());
+  return res;
 }
 
-void  RSKNN::processPCLFeatureKNN(std::string train_matrix_name, std::string train_label_name, std::string set_mode, int default_k, std::string feature_use,
-                                  std::vector<rs::Cluster> clusters, RSKNN *obj_VFH, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
+void  RSKNN::processPCLFeatureKNN(std::string set_mode, std::string feature_use,
+                                  std::vector<rs::Cluster> clusters, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
-  outInfo("Number of cluster:" << clusters.size() << std::endl);
+  outInfo("Number of cluster:" << clusters.size());
 
   for(size_t i = 0; i < clusters.size(); ++i) {
     rs::Cluster &cluster = clusters[i];
@@ -181,13 +144,14 @@ void  RSKNN::processPCLFeatureKNN(std::string train_matrix_name, std::string tra
       for(size_t k = 0; k < featDescriptor.size(); ++k) {
         test_mat.at<float>(0, k) = featDescriptor[k];
       }
-      outInfo("number of elements in :" << i << std::endl);
+      outInfo("number of elements in :" << i);
 
       double classLabel;
       double confi;
-      obj_VFH->classifyOnLiveDataKNN(train_matrix_name, train_label_name, default_k, test_mat, classLabel);
+      classLabel = classifyOnLiveDataKNN(test_mat);
       int classLabelInInt = classLabel;
       std::string classLabelInString = models_label[classLabelInInt - 1];
+      outInfo("prediction class is :" << classLabelInInt <<"class label being: " <<classLabelInString);
 
       //To annotate the clusters..................
       annotate_hypotheses(tcas, classLabelInString, feature_use, cluster, set_mode, confi);
@@ -198,7 +162,7 @@ void  RSKNN::processPCLFeatureKNN(std::string train_matrix_name, std::string tra
       rs::conversion::from(image_roi.roi_hires.get(), rect);
 
       //Draw result on image...........
-      obj_VFH->drawCluster(color, rect, classLabelInString);
+      drawCluster(color, rect, classLabelInString);
 
       outInfo("calculation is done" << std::endl);
     }
@@ -207,7 +171,7 @@ void  RSKNN::processPCLFeatureKNN(std::string train_matrix_name, std::string tra
 
 void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string train_label_name,
                                     std::string set_mode, int default_k, std::string feature_use, std::vector<rs::Cluster> clusters,
-                                    RSKNN *obj_caffe, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
+                                    cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
   //clusters comming from RS pipeline............................
   outInfo("Number of cluster:" << clusters.size() << std::endl);
@@ -219,9 +183,9 @@ void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string t
 
     for(size_t j = 0; j < features.size(); ++j) {
       rs::Features &feats = features[j];
-      outInfo("type of feature:" << feats.descriptorType() << std::endl);
-      outInfo("size of feature:" << feats.descriptors << std::endl);
-      outInfo("size of source:" << feats.source() << std::endl);
+      outInfo("type of feature:" << feats.descriptorType());
+      outInfo("size of feature:" << feats.descriptors);
+      outInfo("size of source:" << feats.source());
 
       //variable to store caffe feature..........
       cv::Mat featDescriptor;
@@ -232,7 +196,7 @@ void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string t
         outInfo("Size after conversion:" << featDescriptor.size());
 
         //The function generate the prediction result................
-        obj_caffe->classifyOnLiveDataKNN(train_matrix_name, train_label_name, default_k, featDescriptor, classLabel);
+        classLabel = classifyOnLiveDataKNN(featDescriptor);
 
         //class label in integer, which is used as index of vector model_label.
         int classLabelInInt = classLabel;
@@ -248,9 +212,9 @@ void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string t
         rs::conversion::from(image_roi.roi_hires.get(), rect);
 
         //Draw result on image...........................
-        obj_caffe->drawCluster(color, rect, classLabelInString);
+        drawCluster(color, rect, classLabelInString);
       }
-      outInfo("calculation is done" << std::endl);
+      outInfo("calculation is done");
     }
   }
 }
@@ -281,6 +245,6 @@ void RSKNN::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::st
   }
 }
 
-RSKNN::~ RSKNN()
+RSKNN::~RSKNN()
 {
 }

@@ -65,7 +65,7 @@ void readClassLabel(std::string obj_file_path,
     std::cout << "Object file has no classes defined" << std::endl;
   }
   else {
-    double clslabel = 0;
+    double clslabel = 1;
     for(auto c : classes) {
       std::vector<std::string> subclasses;
 #if CV_MAJOR_VERSION == 2

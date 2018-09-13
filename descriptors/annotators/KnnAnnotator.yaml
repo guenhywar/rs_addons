@@ -2,11 +2,11 @@ annotator:
   implementation: rs_knnAnnotator
   name: KnnAnnotator
 capabilities:
-  inputs: []
-  outputs: []
+  inputs: ['rs.scene.MergedCluster']
+  outputs: ['rs.annotations.Classification']
 parameters:
-  actual_class_label: IAI_CNN_ClassLabel_unreal
-  default_k: 3
-  set_mode: CL
-  trainKNNLabel_matrix: IAI_CNN_MatTrainLabel_unreal
-  trainKNN_matrix: IAI_CNN_MatTrain_unreal
+  feature_descriptor_type: VFH
+  class_label_mapping: objects_dataset/extractedFeat/VFH_ClassLabel_pnp_15_obj.txt
+  default_k: 5
+  set_mode: CL # CL|GT CL-for adding Classification results; use classifier to semi-automate adding GT to data
+  training_data: objects_dataset/extractedFeat/VFH_data_pnp_15_obj.yaml

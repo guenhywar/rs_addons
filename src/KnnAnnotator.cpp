@@ -34,7 +34,7 @@ private:
   cv::Mat color;
 
   //set_mode should be GT(groundTruth) or CL (classify)....
-  std::string set_mode;
+  std::string mode;
 
   //the value of k-neighbors in the knn-classifier
   int default_k;
@@ -55,38 +55,37 @@ private:
   //vector to hold classes name
   std::vector<std::string> model_labels;
 
+  RSKNN *knnObject;
+
 public:
 
   KnnAnnotator(): DrawingAnnotator(__func__)
   {}
 
-  RSKNN* knnObject= new RSKNN;
+
 
   TyErrorId initialize(AnnotatorContext &ctx)
   {
-    outInfo("Name of the loaded files for KNN are :"<<std::endl);
-    ctx.extractValue("set_mode", set_mode);
-    outInfo("set_mode:"<<set_mode<<std::endl);
+    outInfo("Name of the loaded files for KNN are :" );
+    ctx.extractValue("set_mode", mode);
+    outInfo("set_mode:" << mode << std::endl);
 
     ctx.extractValue("default_k", default_k);
-    outInfo("Value of k-neighbors: " << default_k <<std::endl);
+    outInfo("Value of k-neighbors: " << default_k);
 
-    ctx.extractValue("trainKNN_matrix", trainKNN_matrix);
-    outInfo("trainKNN_matrix:"<< trainKNN_matrix <<std::endl);
+    ctx.extractValue("training_data", trainKNN_matrix);
+    outInfo("training_data:" << trainKNN_matrix);
 
-    ctx.extractValue("trainKNNLabel_matrix", trainKNNLabel_matrix);
-    outInfo("trainKNNLabel_matrix:"<< trainKNNLabel_matrix <<std::endl);
-
-    ctx.extractValue("actual_class_label", actual_class_label);
-    outInfo("actual_class_label:"<<actual_class_label<<std::endl);
+    ctx.extractValue("class_label_mapping", actual_class_label);
+    outInfo("class_label_mapping:" << actual_class_label );
 
     knnObject->setLabels(actual_class_label, model_labels);
 
-    boost::split(split_model, trainKNN_matrix, boost::is_any_of("_"));
+    ctx.extractValue("feature_descriptor_type", feature_use);
+    outInfo("feature descriptor set: "<<feature_use);
 
-    feature_use= split_model[1];
-    outInfo("feature_use:"<<feature_use<<std::endl);
-
+    knnObject = new RSKNN(default_k);
+    knnObject->loadModelFile(trainKNN_matrix);
     return UIMA_ERR_NONE;
   }
 
@@ -104,24 +103,20 @@ public:
     cas.get(VIEW_COLOR_IMAGE_HD, color);
     std::vector<rs::Cluster> clusters;
     scene.identifiables.filter(clusters);
-
-
-    if(feature_use == "VFH" || feature_use == "CVFH")
-    {
-      outInfo("Calculation starts with : " << set_mode  << "::" << feature_use);
-      knnObject->processPCLFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, set_mode, default_k, feature_use, clusters, knnObject, color, model_labels, tcas);
+    outInfo("Feature to use: "<<feature_use);
+    if(feature_use == "VFH" || feature_use == "CVFH") {
+      outInfo("Calculation starts with : " << mode  << "::" << feature_use);
+      knnObject->processPCLFeatureKNN(mode, feature_use, clusters, color, model_labels, tcas);
     }
-    else if(feature_use == "CNN" || feature_use == "VGG16")
-    {
-      outInfo("Calculation starts with : " << set_mode << "::" << feature_use);
-      knnObject->processCaffeFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, set_mode, default_k, feature_use, clusters, knnObject, color, model_labels, tcas);
+    else if(feature_use == "CNN" || feature_use == "VGG16") {
+      outInfo("Calculation starts with : " << mode << "::" << feature_use);
+      knnObject->processCaffeFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, mode, default_k, feature_use, clusters, color, model_labels, tcas);
     }
-    else
-    {
+    else {
       outError("Please sellect the correct value of parameter(feature_use): VFH, CVFH, CNN, VGG16");
     }
 
-    outInfo("calculation is done with RSKNN"<<std::endl);
+    outInfo("calculation is done with RSKNN" << std::endl);
     return UIMA_ERR_NONE;
   }
 

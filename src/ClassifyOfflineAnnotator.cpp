@@ -83,7 +83,7 @@ public:
       ctx.extractValue("default_k", default_k);
       outInfo("value of k-neighbours: " << default_k <<std::endl);
 
-      RSKNN* knnObject= new RSKNN;
+      RSKNN* knnObject= new RSKNN(5);
       outInfo("Classify with RSKNN is going on .......");
       knnObject->classifyKNN(trainData_matrix ,trainLabel_matrix,test_data_name ,test_label_name,actual_class_label, default_k);
     }

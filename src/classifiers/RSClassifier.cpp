@@ -37,17 +37,16 @@ RSClassifier::RSClassifier()
 
 void RSClassifier::setLabels(std::string file_name, std::vector<std::string> &my_annotation)
 {
-  std::string packagePath = ros::package::getPath("rs_resources");
-  std::string savePath = packagePath + "/objects_dataset/extractedFeat/";
+  std::string packagePath = ros::package::getPath("rs_resources")+"/";
 
   //To check the resource path................................................
-  if(!boost::filesystem::exists(savePath+file_name+".txt"))
+  if(!boost::filesystem::exists(packagePath+file_name))
   {
-    outError(file_name <<" file does not exist in path "<<savePath<<" to read the object's class label."<<std::endl);
+    outError(file_name <<" file does not exist in path "<<packagePath<<" to read the object's class label."<<std::endl);
   } 
   else
   {
-    std::ifstream file((savePath+file_name+".txt").c_str());
+    std::ifstream file((packagePath+file_name).c_str());
 
     std::string str;
     std::vector<std::string> split_str;
@@ -79,15 +78,14 @@ void RSClassifier::readFeaturesFromFile(std::string data_file_path, std::string 
 {
   cv::FileStorage fs;
   std::string packagePath = ros::package::getPath("rs_resources") + '/';
-  std::string savePath = "objects_dataset/extractedFeat/";
 
-  if(!boost::filesystem::exists(data_file_path))
+  if(!boost::filesystem::exists(packagePath + data_file_path))
   {
     outError( data_file_path <<" does not exist. please check" << std::endl);
   }
   else
   {
-    fs.open(data_file_path, cv::FileStorage::READ);
+    fs.open(packagePath + data_file_path, cv::FileStorage::READ);
     fs["descriptors"] >> des_matrix;
     fs["label"] >> des_label;
   }
@@ -99,15 +97,15 @@ void RSClassifier::evaluation(std::vector<int> test_label, std::vector<int> pred
   std::map < std::string, double > object_label;
   std::string resourcePath;
   resourcePath = ros::package::getPath("rs_resources") + '/';
-  std::string lebel_path = "objects_dataset/extractedFeat/" + obj_classInDouble + ".txt";
+  std::string label_path = "objects_dataset/extractedFeat/" + obj_classInDouble + ".txt";
 
-  if(!boost::filesystem::exists(resourcePath + lebel_path))
+  if(!boost::filesystem::exists(resourcePath + label_path))
   {
-    outError(obj_classInDouble <<" file does not exist in path "<<resourcePath + lebel_path << std::endl);
+    outError(obj_classInDouble <<" file does not exist in path "<<resourcePath + label_path << std::endl);
   };
 
   //To read the object class names from rs_resources/object_dataset/objects.txt.......
-  getLabels(resourcePath + lebel_path, object_label);
+  getLabels(resourcePath + label_path, object_label);
 
   //Declare the confusion matrix which takes test data label (test_label) and predicted_label or class as inputs.
   //It's size is defined by the number of classes.

@@ -1,4 +1,4 @@
-//developed by: Rakib
+﻿//developed by: Rakib
 
 #ifndef RSKNN_HEADER
 #define RSKNN_HEADER
@@ -33,7 +33,9 @@ class RSKNN : public RSClassifier
 
 public:
 
-  RSKNN();
+  cv::Ptr<cv::ml::KNearest> knncalld;
+
+  RSKNN(int K);
 
   void trainModel(std::string train_matrix_name, std::string train_label_name, std::string trained_file_name);
 
@@ -46,18 +48,23 @@ public:
   void classifyKNN(std::string train_matrix_name,std::string train_label_name,
                    std::string test_matrix_name, std::string test_label_name, std::string obj_classInDouble, int default_k);
 
-  void classifyOnLiveDataKNN(std::string train_matrix_name, std::string train_label_name, int default_k, cv::Mat test_mat, double &det);
+  double classifyOnLiveDataKNN(cv::Mat test_mat);
 
-  void processPCLFeatureKNN(std::string train_matrix_name,std::string train_label_name,std::string set_mode, int default_k, std::string feature_use,
-                            std::vector<rs::Cluster> clusters, RSKNN *obj_VFH, cv::Mat &color,std::vector<std::string> models_label, uima::CAS &tcas);
+  void processPCLFeatureKNN(std::string set_mode, std::string feature_use,
+                            std::vector<rs::Cluster> clusters, cv::Mat &color,std::vector<std::string> models_label, uima::CAS &tcas);
 
   void processCaffeFeatureKNN(std::string train_matrix_name,std::string train_label_name,
                                std::string set_mode, int default_k, std::string feature_use, std::vector<rs::Cluster> clusters,
-                               RSKNN *obj_caffe, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas);
+                               cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas);
 
-
+  void loadModelFile(std::string pathToModelFile);
 
   ~RSKNN();
+private:
+
+  cv::Mat trainingData_;
+  cv::Mat dataLabels_;
+
 };
 
 #endif
