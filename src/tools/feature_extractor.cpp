@@ -108,73 +108,6 @@ void readClassLabel(std::string obj_file_path,
   std::cout << std::endl;
 }
 
-//To read the split file for Washington Uni........................................
-void readClassLabelWU(std::string obj_file_path, std::vector <std::pair < string, double> > &objectToLabelTrain,
-                      std::vector <std::pair < string, double> > &objectToLabelTest, std::vector <std::pair < string, double> > &objectToClassLabelMap)
-{
-  cv::FileStorage fs;
-  fs.open(obj_file_path, cv::FileStorage::READ);
-  std::vector<std::string> classes;
-#if CV_MAJOR_VERSION == 2
-  fs["classes"] >> classes;
-#elif CV_MAJOR_VERSION == 3
-  cv::FileNode classesNode = fs["classes"];
-  cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
-  for(; it != it_end; ++it) {
-    classes.push_back(static_cast<std::string>(*it));
-  }
-#endif
-  if(classes.empty()) {
-    std::cout << "Object file has no classes defined" << std::endl;
-  }
-  else {
-    for(uint16_t i = 0; i < classes.size(); i++) {
-      double clslabel = clslabel + 1;
-      objectToClassLabelMap.push_back(std::pair< std::string, float >(classes[i], clslabel));
-      std::vector<std::string> subclasses;
-#if CV_MAJOR_VERSION == 2
-      fs[classes[i]] >> subclasses;
-#elif CV_MAJOR_VERSION == 3
-      cv::FileNode classesNode = fs[classes[i]];
-      cv::FileNodeIterator it = classesNode.begin(), it_end = classesNode.end();
-
-      for(; it != it_end; ++it) {
-        classes.push_back(static_cast<std::string>(*it));
-      }
-#endif
-      if(!subclasses.empty())
-        for(uint32_t j = 0; j < subclasses.size(); j++) {
-
-          if(j == 0) {
-            objectToLabelTest.push_back(std::pair< std::string, float >(subclasses[j], clslabel));
-          }
-          else {
-            objectToLabelTrain.push_back(std::pair< std::string, float >(subclasses[j], clslabel));
-          }
-        }
-    }
-  }
-  fs.release();
-  if(!objectToClassLabelMap.empty()) {
-    std::cout << "objectToClassLabel:" << std::endl;
-    for(uint32_t i = 0; i < objectToClassLabelMap.size(); i++) {
-      std::cout << objectToClassLabelMap[i].first << "::" << objectToClassLabelMap[i].second << std::endl;
-    }
-  }
-  if(!objectToLabelTest.empty()) {
-    std::cout << "objectToLabelTest:" << std::endl;
-    for(uint32_t i = 0; i < objectToLabelTest.size(); i++) {
-      std::cout << objectToLabelTest[i].first << "::" << objectToLabelTest[i].second << std::endl;
-    }
-  }
-  if(!objectToLabelTrain.empty()) {
-    std::cout << "objectToLabelTrain:" << std::endl;
-    for(uint32_t i = 0; i < objectToLabelTrain.size(); i++) {
-      std::cout << objectToLabelTrain[i].first << "::" << objectToLabelTrain[i].second << std::endl;
-    }
-  }
-}
-
 //To read all the objects from rs_resources/objects_dataset folder.....................
 void getFiles(const std::string &resourchPath,
               std::vector <std::pair < string, double> > object_label,
@@ -450,7 +383,7 @@ int main(int argc, char **argv)
   std::cout << "Path to split file : " << split_file_path << std::endl;
 
   //To save file in disk...........................................................
-  std::string savePathToOutput = resourcePath + "/objects_dataset/extractedFeat/";
+  std::string savePathToOutput = resourcePath + "/extracted_feats/";
 
   // To check the storage folder for generated files by this program ................................................
   if(!bfs::exists(savePathToOutput)) {
