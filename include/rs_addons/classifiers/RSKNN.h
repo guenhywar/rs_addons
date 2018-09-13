@@ -41,23 +41,23 @@ public:
 
   void classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_mat, double &det, double &confi);
 
-  void RsAnnotation (uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi);
+  void annotate_hypotheses (uima::CAS &tcas, std::string class_name, std::string feature_name, rs::Cluster &cluster, std::string set_mode, double &confi);
 
   void classifyKNN(std::string train_matrix_name,std::string train_label_name,
                    std::string test_matrix_name, std::string test_label_name, std::string obj_classInDouble, int default_k);
 
   void classifyOnLiveDataKNN(std::string train_matrix_name, std::string train_label_name, int default_k, cv::Mat test_mat, double &det);
 
-  void processPCLFeatureKNN(std::string train_matrix_name,std::string train_label_name,std::string set_mode, int default_k, std::string dataset_use,std::string feature_use,
+  void processPCLFeatureKNN(std::string train_matrix_name,std::string train_label_name,std::string set_mode, int default_k, std::string feature_use,
                             std::vector<rs::Cluster> clusters, RSKNN *obj_VFH, cv::Mat &color,std::vector<std::string> models_label, uima::CAS &tcas);
 
   void processCaffeFeatureKNN(std::string train_matrix_name,std::string train_label_name,
-                               std::string set_mode, int default_k, std::string dataset_use,std::string feature_use, std::vector<rs::Cluster> clusters,
+                               std::string set_mode, int default_k, std::string feature_use, std::vector<rs::Cluster> clusters,
                                RSKNN *obj_caffe, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas);
 
 
 
-  ~ RSKNN();
+  ~RSKNN();
 };
 
 #endif

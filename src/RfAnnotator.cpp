@@ -105,12 +105,12 @@ public:
     if(feature_use == "VFH" || feature_use == "CVFH")
     {
       outInfo("Calculation starts with : " << set_mode << "::" << dataset_use << "::" << feature_use);
-      rfObject->processPCLFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, rfObject, color,model_labels, tcas);
+      rfObject->processPCLFeature(trained_model_name,set_mode,feature_use,clusters, rfObject, color,model_labels, tcas);
     }
     else if(feature_use == "CNN" || feature_use == "VGG16")
     {
       outInfo("Calculation starts with : " << set_mode << "::" << dataset_use << "::" << feature_use);
-      rfObject->processCaffeFeature(trained_model_name,set_mode,dataset_use,feature_use,clusters, rfObject, color, model_labels, tcas);
+      rfObject->processCaffeFeature(trained_model_name,set_mode,feature_use,clusters, rfObject, color, model_labels, tcas);
     }
     else
     {

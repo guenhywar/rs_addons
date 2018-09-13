@@ -188,7 +188,7 @@ void RSClassifier::drawCluster(cv::Mat input , cv::Rect rect, const std::string 
   cv::putText(input, label, cv::Point(rect.x + (rect.width - textSize.width) / 2, rect.y - offset - textSize.height), cv::FONT_HERSHEY_PLAIN, 1.5, CV_RGB(0, 0, 0), 2.0);
 }
 
-void  RSClassifier::processPCLFeature(std::string memory_name,std::string set_mode, std::string dataset_use,std::string feature_use,
+void  RSClassifier::processPCLFeature(std::string memory_name,std::string set_mode, std::string feature_use,
                                       std::vector<rs::Cluster> clusters, RSClassifier *obj_VFH, cv::Mat &color,std::vector<std::string> models_label, uima::CAS &tcas)
 {
   outInfo("Number of cluster:" << clusters.size() << std::endl);
@@ -218,7 +218,7 @@ void  RSClassifier::processPCLFeature(std::string memory_name,std::string set_mo
       std::string classLabelInString = models_label[classLabelInInt-1];
 
       //To annotate the clusters..................
-      RsAnnotation (tcas,classLabelInString,feature_use, dataset_use, cluster,set_mode, confi);
+      annotate_hypotheses(tcas,classLabelInString,feature_use,cluster,set_mode, confi);
 
       //set roi on image
       rs::ImageROI image_roi = cluster.rois.get();
@@ -234,7 +234,7 @@ void  RSClassifier::processPCLFeature(std::string memory_name,std::string set_mo
 }
 
 //the function process and classify RGB images, which run from a .bag file.
-void  RSClassifier::processCaffeFeature(std::string memory_name, std::string set_mode, std::string dataset_use,std::string feature_use,
+void  RSClassifier::processCaffeFeature(std::string memory_name, std::string set_mode,std::string feature_use,
                                         std::vector<rs::Cluster> clusters,
                                         RSClassifier *obj_caffe, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
@@ -274,7 +274,7 @@ void  RSClassifier::processCaffeFeature(std::string memory_name, std::string set
         std::string classLabelInString = models_label[classLabelInInt-1];
 
         //To annotate the clusters..................
-        RsAnnotation (tcas,classLabelInString,feature_use, dataset_use, cluster,set_mode, confi);
+        annotate_hypotheses (tcas,classLabelInString,feature_use, cluster,set_mode, confi);
 
         //set roi on image
         rs::ImageROI image_roi = cluster.rois.get();

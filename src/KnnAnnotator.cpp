@@ -39,9 +39,6 @@ private:
   //the value of k-neighbors in the knn-classifier
   int default_k;
 
-  //dataset_use should be IAI (kitchen data from IAI) or WU (data from Washington University) or BOTH...
-  std::string dataset_use;
-
   //feature_use should be VFH, CVFH, CNN, VGG16 .....
   std::string feature_use;
 
@@ -87,9 +84,6 @@ public:
 
     boost::split(split_model, trainKNN_matrix, boost::is_any_of("_"));
 
-    dataset_use= split_model[0];
-    outInfo("dataset_use:"<<dataset_use<<std::endl);
-
     feature_use= split_model[1];
     outInfo("feature_use:"<<feature_use<<std::endl);
 
@@ -114,13 +108,13 @@ public:
 
     if(feature_use == "VFH" || feature_use == "CVFH")
     {
-      outInfo("Calculation starts with : " << set_mode << "::" << dataset_use << "::" << feature_use);
-      knnObject->processPCLFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, set_mode, default_k, dataset_use, feature_use, clusters, knnObject, color, model_labels, tcas);
+      outInfo("Calculation starts with : " << set_mode  << "::" << feature_use);
+      knnObject->processPCLFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, set_mode, default_k, feature_use, clusters, knnObject, color, model_labels, tcas);
     }
     else if(feature_use == "CNN" || feature_use == "VGG16")
     {
-      outInfo("Calculation starts with : " << set_mode << "::" << dataset_use << "::" << feature_use);
-      knnObject->processCaffeFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, set_mode, default_k, dataset_use, feature_use, clusters, knnObject, color, model_labels, tcas);
+      outInfo("Calculation starts with : " << set_mode << "::" << feature_use);
+      knnObject->processCaffeFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, set_mode, default_k, feature_use, clusters, knnObject, color, model_labels, tcas);
     }
     else
     {

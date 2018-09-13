@@ -32,7 +32,7 @@ RSRF::RSRF()
 
 }
 
-void RSRF:: trainModel(std::string train_matrix_name, std::string train_label_name, std::string trained_file_name)
+void RSRF::trainModel(std::string train_matrix_name, std::string train_label_name, std::string trained_file_name)
 {
   cv::Mat train_matrix;
   cv::Mat train_label;
@@ -229,7 +229,7 @@ void RSRF::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_
 //     confi=con;
 }
 
-void RSRF::RsAnnotation(uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi)
+void RSRF::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::Cluster &cluster, std::string set_mode, double &confi)
 {
     rs::ClassConfidence conResult = rs::create<rs::ClassConfidence>(tcas);
     conResult.score.set(confi);
@@ -240,7 +240,7 @@ void RSRF::RsAnnotation(uima::CAS &tcas, std::string class_name, std::string fea
     classResult.classname.set(class_name);
     classResult.classifier("Random Forest");
     classResult.featurename(feature_name);
-    classResult.model(database_name);
+
     if(feature_name == "CNN")
     {
       classResult.classification_type("INSTANCE");

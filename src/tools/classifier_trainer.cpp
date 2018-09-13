@@ -10,7 +10,6 @@
 
 #include <rs_addons/classifiers/RSSVM.h>
 #include <rs_addons/classifiers/RSRF.h>
-#include <rs_addons/classifiers/RSGBT.h>
 #include <rs_addons/classifiers/RSKNN.h>
 
 #include <boost/filesystem.hpp>
@@ -36,7 +35,7 @@ int main(int argc, char **argv)
     desc.add_options()
             ("help,h", "Print help messages")
             ("classifier,c", bpo::value<std::string>(&classifier_type)->default_value("SVM"),
-             "classifier to train: [SVM|RF|GBT|KNN]")
+             "classifier to train: [SVM|RF|KNN]")
             ("input,i", bpo::value<std::string>(&train_data_name)->default_value(""),
              "enter input features file")
             ("out,o", bpo::value<std::string>(&trained_model_name)->default_value("classifier.model"),
@@ -73,12 +72,6 @@ int main(int argc, char **argv)
         RSClassifier* rfObject= new RSRF;
         outInfo("Training with RSRF is going on .......");
         rfObject->trainModel(train_data_name ,train_label_name, trained_model_name);
-    }
-    else if(classifier_type=="GBT")
-    {
-        RSClassifier* gbtObject= new RSGBT;
-        outInfo("Training with RSGBT is going on .......");
-        gbtObject->trainModel(train_data_name ,train_label_name, trained_model_name);
     }
     else if(classifier_type=="KNN")
     {

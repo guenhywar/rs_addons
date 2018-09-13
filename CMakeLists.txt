@@ -72,7 +72,7 @@ include_directories(
 ## Update analysis engines, typesystem and include all relevant files         ##
 ################################################################################
 ##Update xml list of annotators inside analysis engines
-update_analysis_engines(robosherlock)
+#update_analysis_engines(robosherlock)
 ## generate classes from the typesystem xml files
 generate_type_system(robosherlock)
 #find all relevant files
@@ -127,8 +127,7 @@ target_link_libraries(featureExtractor
 add_library(rs_classifiers src/classifiers/RSClassifier.cpp
                            src/classifiers/RSSVM.cpp
                            src/classifiers/RSRF.cpp
-                           src/classifiers/RSKNN.cpp
-                           src/classifiers/RSGBT.cpp)
+                           src/classifiers/RSKNN.cpp)
 target_link_libraries(rs_classifiers ${OpenCV_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 
@@ -154,12 +153,6 @@ rs_add_library(rs_knnAnnotator src/KnnAnnotator.cpp)
 target_link_libraries(rs_knnAnnotator rs_classifiers
     ${CATKIN_LIBRARIES}
     ${OpenCV_LIBRARIES})
-
-rs_add_library(rs_gbAnnotator src/GbAnnotator.cpp)
-target_link_libraries(rs_gbAnnotator rs_classifiers
-    ${catkin_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    )
 
 rs_add_library(rs_unrealGTAnnotator src/UnrealGTAnnotator.cpp)
 target_link_libraries(rs_unrealGTAnnotator

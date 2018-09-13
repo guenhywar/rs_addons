@@ -38,7 +38,7 @@ RSKNN::RSKNN()
 {
 }
 
-void RSKNN:: trainModel(std::string train_matrix_name, std::string train_label_name,std::string train_label_n)
+void RSKNN:: trainModel(std::string train_matrix_name, std::string train_label_name, std::string train_label_n)
 {
 }
 
@@ -69,10 +69,10 @@ void RSKNN:: classifyKNN(std::string train_matrix_name, std::string train_label_
   std::cout << "size of test label" << test_label.size() << std::endl;
 
 #if CV_MAJOR_VERSION == 2
-  CvKNearest* knncalld = new CvKNearest;
+  CvKNearest *knncalld = new CvKNearest;
 
   //Train the classifier...................................
-  knncalld->train(train_matrix, train_label, cv::Mat(), false, default_k,false);
+  knncalld->train(train_matrix, train_label, cv::Mat(), false, default_k, false);
 
   //To get the value of k.............
   int k_max = knncalld->get_max_k();
@@ -98,11 +98,10 @@ void RSKNN:: classifyKNN(std::string train_matrix_name, std::string train_label_
   std::vector<int> actual_label;
   std::vector<int> predicted_label;
 
-  for(int i = 0; i < test_label.rows; i++)
-  {
+  for(int i = 0; i < test_label.rows; i++) {
 #if CV_MAJOR_VERSION == 2
     // double res = knncls->find_nearest(test_matrix.row(i), k,bestResponse,neighborResponses,distances);
-    double res = knncalld->find_nearest(test_matrix.row(i),k_max);
+    double res = knncalld->find_nearest(test_matrix.row(i), k_max);
 #elif CV_MAJOR_VERSION == 3
 
     double res = knncalld->findNearest(test_matrix.row(i), k_max, cv::noArray());
@@ -131,7 +130,7 @@ void RSKNN::classifyOnLiveDataKNN(std::string train_matrix_name, std::string tra
   std::cout << "size of test matrix :" << test_mat.size() << std::endl;
 
 #if CV_MAJOR_VERSION == 2
-  CvKNearest* knncalldc = new CvKNearest;
+  CvKNearest *knncalldc = new CvKNearest;
 
   //Train the classifier...................................
   knncalldc->train(train_matrix, train_label, cv::Mat(), false, default_k, false);
@@ -142,7 +141,7 @@ void RSKNN::classifyOnLiveDataKNN(std::string train_matrix_name, std::string tra
 
   //double res = knnclsa->find_nearest(test_mat, default_k, bestResponse, neighborResponses, distances);
 
-  double res = knncalldc->find_nearest(test_mat,k_max);
+  double res = knncalldc->find_nearest(test_mat, k_max);
   std::cout << "prediction class is :" << res << std::endl;
   det = res;
 #elif CV_MAJOR_VERSION == 3
@@ -162,27 +161,24 @@ void RSKNN::classifyOnLiveDataKNN(std::string train_matrix_name, std::string tra
 #endif
 }
 
-void  RSKNN::processPCLFeatureKNN(std::string train_matrix_name,std::string train_label_name,std::string set_mode, int default_k,std::string dataset_use,std::string feature_use,
-                                  std::vector<rs::Cluster> clusters, RSKNN *obj_VFH, cv::Mat &color,std::vector<std::string> models_label, uima::CAS &tcas)
+void  RSKNN::processPCLFeatureKNN(std::string train_matrix_name, std::string train_label_name, std::string set_mode, int default_k, std::string feature_use,
+                                  std::vector<rs::Cluster> clusters, RSKNN *obj_VFH, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
   outInfo("Number of cluster:" << clusters.size() << std::endl);
 
-  for(size_t i = 0; i < clusters.size(); ++i)
-  {
+  for(size_t i = 0; i < clusters.size(); ++i) {
     rs::Cluster &cluster = clusters[i];
     std::vector<rs::PclFeature> features;
     cluster.annotations.filter(features);
 
-    for(size_t j = 0; j < features.size(); ++j)
-    {
+    for(size_t j = 0; j < features.size(); ++j) {
       rs::PclFeature &feats = features[j];
       outInfo("type of feature:" << feats.feat_type() << std::endl);
       std::vector<float> featDescriptor = feats.feature();
       outInfo("Size after conversion:" << featDescriptor.size());
       cv::Mat test_mat(1, featDescriptor.size(), CV_32F);
 
-      for(size_t k = 0; k < featDescriptor.size(); ++k)
-      {
+      for(size_t k = 0; k < featDescriptor.size(); ++k) {
         test_mat.at<float>(0, k) = featDescriptor[k];
       }
       outInfo("number of elements in :" << i << std::endl);
@@ -191,10 +187,10 @@ void  RSKNN::processPCLFeatureKNN(std::string train_matrix_name,std::string trai
       double confi;
       obj_VFH->classifyOnLiveDataKNN(train_matrix_name, train_label_name, default_k, test_mat, classLabel);
       int classLabelInInt = classLabel;
-      std::string classLabelInString = models_label[classLabelInInt-1];
+      std::string classLabelInString = models_label[classLabelInInt - 1];
 
       //To annotate the clusters..................
-      RsAnnotation (tcas,classLabelInString,feature_use, dataset_use, cluster,set_mode, confi);
+      annotate_hypotheses(tcas, classLabelInString, feature_use, cluster, set_mode, confi);
 
       //set roi on image
       rs::ImageROI image_roi = cluster.rois.get();
@@ -210,20 +206,18 @@ void  RSKNN::processPCLFeatureKNN(std::string train_matrix_name,std::string trai
 }
 
 void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string train_label_name,
-                                    std::string set_mode, int default_k, std::string dataset_use, std::string feature_use, std::vector<rs::Cluster> clusters,
+                                    std::string set_mode, int default_k, std::string feature_use, std::vector<rs::Cluster> clusters,
                                     RSKNN *obj_caffe, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
   //clusters comming from RS pipeline............................
   outInfo("Number of cluster:" << clusters.size() << std::endl);
 
-  for(size_t i = 0; i < clusters.size(); ++i)
-  {
+  for(size_t i = 0; i < clusters.size(); ++i) {
     rs::Cluster &cluster = clusters[i];
     std::vector<rs::Features> features;
     cluster.annotations.filter(features);
 
-    for(size_t j = 0; j < features.size(); ++j)
-    {
+    for(size_t j = 0; j < features.size(); ++j) {
       rs::Features &feats = features[j];
       outInfo("type of feature:" << feats.descriptorType() << std::endl);
       outInfo("size of feature:" << feats.descriptors << std::endl);
@@ -233,21 +227,20 @@ void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string t
       cv::Mat featDescriptor;
       double classLabel;
 
-      if(feats.source()=="Caffe")
-      {
+      if(feats.source() == "Caffe") {
         rs::conversion::from(feats.descriptors(), featDescriptor);
         outInfo("Size after conversion:" << featDescriptor.size());
 
         //The function generate the prediction result................
-        obj_caffe->classifyOnLiveDataKNN(train_matrix_name,train_label_name, default_k, featDescriptor, classLabel);
+        obj_caffe->classifyOnLiveDataKNN(train_matrix_name, train_label_name, default_k, featDescriptor, classLabel);
 
         //class label in integer, which is used as index of vector model_label.
         int classLabelInInt = classLabel;
         double confi;
-        std::string classLabelInString = models_label[classLabelInInt-1];
+        std::string classLabelInString = models_label[classLabelInInt - 1];
 
         //To annotate the clusters..................
-        RsAnnotation (tcas,classLabelInString,feature_use, dataset_use, cluster,set_mode, confi);
+        annotate_hypotheses(tcas, classLabelInString, feature_use, cluster, set_mode, confi);
 
         //set roi on image
         rs::ImageROI image_roi = cluster.rois.get();
@@ -262,33 +255,28 @@ void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string t
   }
 }
 
-void RSKNN::RsAnnotation(uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi)
+void RSKNN::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::Cluster &cluster, std::string set_mode, double &confi)
 {
   rs::Classification classResult = rs::create<rs::Classification>(tcas);
   classResult.classname.set(class_name);
   classResult.classifier("k-Nearest Neighbor");
   classResult.featurename(feature_name);
-  classResult.model(database_name);
-  if(feature_name == "CNN")
-  {
+  if(feature_name == "CNN") {
     classResult.classification_type("INSTANCE");
-  } else if(feature_name == "VFH")
-  {
-    classResult.classification_type("SHAPE");
+  }
+  else if(feature_name == "VFH") {
+    classResult.classification_type("INSTANCE");
   }
 
-  if(set_mode == "CL")
-  {
+  if(set_mode == "CL") {
     cluster.annotations.append(classResult);
   }
-  else if(set_mode == "GT")
-  {
+  else if(set_mode == "GT") {
     rs::GroundTruth setGT = rs::create<rs::GroundTruth>(tcas);
     setGT.classificationGT.set(classResult);
     cluster.annotations.append(setGT);
   }
-  else
-  {
+  else {
     outError("You should set the parameter (set_mode) as CL or GT");
   }
 }

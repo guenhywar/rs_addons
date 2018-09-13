@@ -175,13 +175,13 @@ void RSSVM::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test
   std::cout << "predicted class is :" << res << std::endl;
 }
 
-void RSSVM::RsAnnotation(uima::CAS &tcas, std::string class_name, std::string feature_name, std::string database_name, rs::Cluster &cluster, std::string set_mode, double &confi)
+void RSSVM::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::Cluster &cluster, std::string set_mode, double &confi)
 {
   rs::Classification classResult = rs::create<rs::Classification>(tcas);
   classResult.classname.set(class_name);
   classResult.classifier("Support Vector Machine");
   classResult.featurename(feature_name);
-  classResult.model(database_name);
+
   if(feature_name == "CNN") {
     classResult.classification_type("INSTANCE");
   }

@@ -9,7 +9,6 @@
 
 #include <rs_addons/classifiers/RSSVM.h>
 #include <rs_addons/classifiers/RSRF.h>
-#include <rs_addons/classifiers/RSGBT.h>
 #include <rs_addons/classifiers/RSKNN.h>
 
 using namespace uima;
@@ -72,12 +71,6 @@ public:
       RSClassifier* rfObject= new RSRF;
       outInfo("Classify with RSRF is going on .......");
       rfObject->classify(trained_model_name ,test_data_name ,test_label_name,actual_class_label);
-    }
-    else if(classifier_type=="rsgbt")
-    {
-      RSClassifier* gbtObject= new RSGBT;
-      outInfo("Classify with RGBT is going on .......");
-      gbtObject->classify(trained_model_name ,test_data_name ,test_label_name,actual_class_label);
     }
     else if(classifier_type =="rsknn")
     {
