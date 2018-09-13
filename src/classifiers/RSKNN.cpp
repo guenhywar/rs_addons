@@ -225,7 +225,8 @@ void RSKNN::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::st
   classResult.classname.set(class_name);
   classResult.classifier("k-Nearest Neighbor");
   classResult.featurename(feature_name);
-  if(feature_name == "CNN") {
+  classResult.source.set("Knn");
+  if(feature_name == "BVLC_REF") {
     classResult.classification_type("INSTANCE");
   }
   else if(feature_name == "VFH") {

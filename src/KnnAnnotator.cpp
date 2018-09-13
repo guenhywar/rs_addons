@@ -66,7 +66,6 @@ public:
 
   TyErrorId initialize(AnnotatorContext &ctx)
   {
-    outInfo("Name of the loaded files for KNN are :" );
     ctx.extractValue("set_mode", mode);
     outInfo("set_mode:" << mode << std::endl);
 
@@ -108,12 +107,12 @@ public:
       outInfo("Calculation starts with : " << mode  << "::" << feature_use);
       knnObject->processPCLFeatureKNN(mode, feature_use, clusters, color, model_labels, tcas);
     }
-    else if(feature_use == "CNN" || feature_use == "VGG16") {
+    else if(feature_use == "BVLC_REF" || feature_use == "VGG16") {
       outInfo("Calculation starts with : " << mode << "::" << feature_use);
       knnObject->processCaffeFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, mode, default_k, feature_use, clusters, color, model_labels, tcas);
     }
     else {
-      outError("Please sellect the correct value of parameter(feature_use): VFH, CVFH, CNN, VGG16");
+      outError("Please sellect the correct value of parameter(feature_use): VFH, CVFH, BVLC_REF, VGG16");
     }
 
     outInfo("calculation is done with RSKNN" << std::endl);
