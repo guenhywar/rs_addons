@@ -109,7 +109,7 @@ public:
     }
     else if(feature_use == "BVLC_REF" || feature_use == "VGG16") {
       outInfo("Calculation starts with : " << mode << "::" << feature_use);
-      knnObject->processCaffeFeatureKNN(trainKNN_matrix, trainKNNLabel_matrix, mode, default_k, feature_use, clusters, color, model_labels, tcas);
+      knnObject->processCaffeFeatureKNN(mode, feature_use, clusters, color, model_labels, tcas);
     }
     else {
       outError("Please sellect the correct value of parameter(feature_use): VFH, CVFH, BVLC_REF, VGG16");

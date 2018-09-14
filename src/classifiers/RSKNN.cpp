@@ -117,11 +117,19 @@ void RSKNN:: classifyKNN(std::string train_matrix_name, std::string train_label_
   evaluation(actual_label, predicted_label, obj_classInDouble);
 }
 
-double RSKNN::classifyOnLiveDataKNN(cv::Mat test_mat)
+std::pair<double,double> RSKNN::classifyOnLiveDataKNN(cv::Mat test_mat)
 {
   int k_max = knncalld->getDefaultK();
-  double res = knncalld->findNearest(test_mat, k_max, cv::noArray());
-  return res;
+
+
+  cv::normalize(test_mat, test_mat, 1, 0, cv::NORM_L2);
+
+  cv::Mat results, neighborResponses, dists;
+  double res = knncalld->findNearest(test_mat, k_max, results, neighborResponses, dists);
+  outInfo(dists);
+  double confidence = (2 - dists.at<float>(0))/2;
+
+  return std::pair<double, double>(res,confidence);
 }
 
 void  RSKNN::processPCLFeatureKNN(std::string set_mode, std::string feature_use,
@@ -145,16 +153,15 @@ void  RSKNN::processPCLFeatureKNN(std::string set_mode, std::string feature_use,
         test_mat.at<float>(0, k) = featDescriptor[k];
       }
       outInfo("number of elements in :" << i);
+      std::pair<double, double> result = classifyOnLiveDataKNN(test_mat);
+      int classLabelInInt = result.first;
+      double confidence = result.second;
 
-      double classLabel;
-      double confi;
-      classLabel = classifyOnLiveDataKNN(test_mat);
-      int classLabelInInt = classLabel;
       std::string classLabelInString = models_label[classLabelInInt - 1];
-      outInfo("prediction class is :" << classLabelInInt <<"class label being: " <<classLabelInString);
+      outInfo("prediction class is :" << classLabelInInt <<"class label being: " <<classLabelInString<<" with confidence: "<<confidence);
 
       //To annotate the clusters..................
-      annotate_hypotheses(tcas, classLabelInString, feature_use, cluster, set_mode, confi);
+      annotate_hypotheses(tcas, classLabelInString, feature_use, cluster, set_mode, confidence);
 
       //set roi on image
       rs::ImageROI image_roi = cluster.rois.get();
@@ -169,8 +176,7 @@ void  RSKNN::processPCLFeatureKNN(std::string set_mode, std::string feature_use,
   }
 }
 
-void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string train_label_name,
-                                    std::string set_mode, int default_k, std::string feature_use, std::vector<rs::Cluster> clusters,
+void  RSKNN::processCaffeFeatureKNN(std::string set_mode, std::string feature_use, std::vector<rs::Cluster> clusters,
                                     cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
   //clusters comming from RS pipeline............................
@@ -183,28 +189,24 @@ void  RSKNN::processCaffeFeatureKNN(std::string train_matrix_name, std::string t
 
     for(size_t j = 0; j < features.size(); ++j) {
       rs::Features &feats = features[j];
-      outInfo("type of feature:" << feats.descriptorType());
-      outInfo("size of feature:" << feats.descriptors);
-      outInfo("size of source:" << feats.source());
-
       //variable to store caffe feature..........
       cv::Mat featDescriptor;
-      double classLabel;
 
       if(feats.source() == "Caffe") {
         rs::conversion::from(feats.descriptors(), featDescriptor);
         outInfo("Size after conversion:" << featDescriptor.size());
 
         //The function generate the prediction result................
-        classLabel = classifyOnLiveDataKNN(featDescriptor);
+
+        std::pair<double, double> result = classifyOnLiveDataKNN(featDescriptor);
+        int classLabelInInt = result.first;
+        double confidence = result.second;
 
         //class label in integer, which is used as index of vector model_label.
-        int classLabelInInt = classLabel;
-        double confi;
         std::string classLabelInString = models_label[classLabelInInt - 1];
-
+        outInfo("prediction class is :" << classLabelInInt <<" class label being: " <<classLabelInString<<" with confidence: "<<confidence);
         //To annotate the clusters..................
-        annotate_hypotheses(tcas, classLabelInString, feature_use, cluster, set_mode, confi);
+        annotate_hypotheses(tcas, classLabelInString, feature_use, cluster, set_mode, confidence);
 
         //set roi on image
         rs::ImageROI image_roi = cluster.rois.get();

@@ -48,13 +48,12 @@ public:
   void classifyKNN(std::string train_matrix_name,std::string train_label_name,
                    std::string test_matrix_name, std::string test_label_name, std::string obj_classInDouble, int default_k);
 
-  double classifyOnLiveDataKNN(cv::Mat test_mat);
+  std::pair<double,double> classifyOnLiveDataKNN(cv::Mat test_mat);
 
   void processPCLFeatureKNN(std::string set_mode, std::string feature_use,
                             std::vector<rs::Cluster> clusters, cv::Mat &color,std::vector<std::string> models_label, uima::CAS &tcas);
 
-  void processCaffeFeatureKNN(std::string train_matrix_name,std::string train_label_name,
-                               std::string set_mode, int default_k, std::string feature_use, std::vector<rs::Cluster> clusters,
+  void processCaffeFeatureKNN( std::string set_mode, std::string feature_use, std::vector<rs::Cluster> clusters,
                                cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas);
 
   void loadModelFile(std::string pathToModelFile);
