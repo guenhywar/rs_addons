@@ -2,8 +2,9 @@ annotator:
   implementation: rs_knnAnnotator
   name: KnnAnnotator
 capabilities:
-  inputs: ['rs.scene.MergedCluster']
-  outputs: ['rs.annotations.Classification']
+  inputs: ['rs.scene.MergedCluster', 'rs.annotation.Features']
+  outputs: 
+    - rs.annotation.Classification: [CupEcoOrange,RedMetalPlateWhiteSpeckles,BluePlasticFork,BluePlasticKnife,RedPlasticKnife,BlueMetalPlateWhiteSpeckles,SiggBottle,ElBrygCoffee,KelloggsCornFlakes,ReineButterMilch,PfannerPfirsichIcetea,VollMilch,SojaMilch,MeerSalz]
 parameters:
   feature_descriptor_type: BVLC_REF 
   class_label_mapping: extracted_feats/BVLC_REF_ClassLabel_pnp_15_obj.txt
