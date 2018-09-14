@@ -12,7 +12,7 @@
 // PCL
 #include <pcl/pcl_config.h>
 
-#if PCL_MINOR_VERSION == 8
+#if PCL_MINOR_VERSION >  7
 
 #include <pcl/filters/extract_indices.h>
 #include <pcl/io/pcd_io.h>
@@ -55,7 +55,9 @@ private:
     std::vector<pcl::PointIndicesPtr> partsOfClusters;
     pcl::PointCloud<pcl::PointXYZL>::Ptr labeledCloud;
     pcl::PointCloud<pcl::PointNormal>::Ptr svNormalCloud;
+#if PCL_MINOR_VERSION > 7
     std::map <uint32_t, pcl::Supervoxel<PointT>::Ptr > supervoxelClusters;
+#endif
   };
 
 
@@ -107,7 +109,7 @@ public:
 
   void overSegmentAndGrow(const pcl::PointIndicesPtr &indices, ClusterWithParts &cwp)
   {
-#if PCL_MINOR_VERSION == 8
+#if PCL_MINOR_VERSION > 7
     pcl::PointCloud<PointT>::Ptr clusterCloud(new pcl::PointCloud<PointT>());
     pcl::ExtractIndices<PointT> ei;
     ei.setInputCloud(cloudPtr_);
@@ -281,7 +283,7 @@ private:
         }
       }
     }
-#if PCL_MINOR_VERSION == 8
+#if PCL_MINOR_VERSION > 7
 
     std::vector<rs::Identifiable> mergedClusters;
     for(int i = 0; i < clusters.size(); ++i) {
