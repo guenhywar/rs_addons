@@ -10,6 +10,10 @@
 #include <rs/conversion/bson.h>
 
 // PCL
+#include <pcl/pcl_config.h>
+
+#if PCL_MINOR_VERSION == 8
+
 #include <pcl/filters/extract_indices.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/search/kdtree.h>
@@ -20,6 +24,8 @@
 
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/surface/mls.h>
+
+#endif
 
 #include <rs/queryanswering/KRDefinitions.h>
 #include <rs/queryanswering/JsonPrologInterface.h>
@@ -44,8 +50,7 @@ private:
 
   //  RSAnalysisEngine engine;
   //  PrologInterface prologInterface;
-  struct ClusterWithParts
-  {
+  struct ClusterWithParts {
     pcl::PointIndicesPtr indices;
     std::vector<pcl::PointIndicesPtr> partsOfClusters;
     pcl::PointCloud<pcl::PointXYZL>::Ptr labeledCloud;
@@ -70,8 +75,7 @@ private:
 
   cv::Mat dispRGB;
 
-  enum class DisplayMode
-  {
+  enum class DisplayMode {
     MERGED,
     SUPERVOX
   } dispMode;
@@ -100,8 +104,10 @@ public:
     return UIMA_ERR_NONE;
   }
 
+
   void overSegmentAndGrow(const pcl::PointIndicesPtr &indices, ClusterWithParts &cwp)
   {
+#if PCL_MINOR_VERSION == 8
     pcl::PointCloud<PointT>::Ptr clusterCloud(new pcl::PointCloud<PointT>());
     pcl::ExtractIndices<PointT> ei;
     ei.setInputCloud(cloudPtr_);
@@ -154,15 +160,13 @@ public:
     pcl::PointIndicesPtr partTwoIndices(new pcl::PointIndices());
 
     for(auto labelItr = supervoxel_adjacency.begin();
-        labelItr != supervoxel_adjacency.end();)
-    {
+        labelItr != supervoxel_adjacency.end();) {
       uint32_t supervoxel_label = labelItr->first;
       pcl::Supervoxel<PointT>::Ptr supervoxel = cwp.supervoxelClusters.at(supervoxel_label);
       pcl::PointNormal svNormal;
       supervoxel->getCentroidPointNormal(svNormal);
       std::multimap<uint32_t, uint32_t>::iterator adjacent_itr = supervoxel_adjacency.equal_range(supervoxel_label).first;
-      for(; adjacent_itr != supervoxel_adjacency.equal_range(supervoxel_label).second; ++adjacent_itr)
-      {
+      for(; adjacent_itr != supervoxel_adjacency.equal_range(supervoxel_label).second; ++adjacent_itr) {
         pcl::Supervoxel<PointT>::Ptr neighbor_supervoxel = cwp.supervoxelClusters.at(adjacent_itr->second);
         pcl::PointNormal svNeighbourNormal;
         neighbor_supervoxel->getCentroidPointNormal(svNeighbourNormal);
@@ -171,8 +175,7 @@ public:
 
         //outInfo("Angle between svl:" << supervoxel_label << " and svl:" << adjacent_itr->second << " is: " << fabs(point_a_normal.dot(point_b_normal)));
         Eigen::Vector3f dist(svNormal.x - svNeighbourNormal.x, svNormal.y - svNeighbourNormal.y, svNormal.z - svNeighbourNormal.z);
-        if(std::abs(point_a_normal.dot(point_b_normal)) > 0.96 && !processed[(int)adjacent_itr->second - 1])
-        {
+        if(std::abs(point_a_normal.dot(point_b_normal)) > 0.96 && !processed[(int)adjacent_itr->second - 1]) {
           processed[(int)adjacent_itr->second - 1] = true;
         }
       }
@@ -181,15 +184,12 @@ public:
     }
 
     cwp.labeledCloud = superVoxClust.getLabeledCloud();
-    for(unsigned int i =  0; i < cwp.labeledCloud->points.size(); ++i)
-    {
+    for(unsigned int i =  0; i < cwp.labeledCloud->points.size(); ++i) {
       pcl::PointXYZL &p = cwp.labeledCloud->points[i];
-      if(p.label != 0 && processed[(int)p.label - 1])
-      {
+      if(p.label != 0 && processed[(int)p.label - 1]) {
         partOneIndices->indices.push_back(indices->indices.at(i));
       }
-      else
-      {
+      else {
         partTwoIndices->indices.push_back(indices->indices.at(i));
       }
     }
@@ -199,6 +199,9 @@ public:
       cwp.partsOfClusters.push_back(partOneIndices);
     if(partTwoIndices->indices.size() > indices->indices.size() / 3)
       cwp.partsOfClusters.push_back(partTwoIndices);
+#else
+      outError("This annotator needs PCL 1.8 to run");
+#endif
   }
 
 
@@ -217,8 +220,7 @@ public:
     int max_y = -1;
 
     cv::Mat mask_full = cv::Mat::zeros(height, width, CV_8U);
-    for(size_t i = 0; i < indices->indices.size(); ++i)
-    {
+    for(size_t i = 0; i < indices->indices.size(); ++i) {
       const int idx = indices->indices[i];
       const int x = idx % width;
       const int y = idx / width;
@@ -267,26 +269,22 @@ private:
 
     rs::Query query = rs::create<rs::Query>(tcas);
     std::string obj_to_inspect = "";
-    if(cas.getFS("QUERY", query))
-    {
+    if(cas.getFS("QUERY", query)) {
       std::string queryAsString = query.query();
-      if(queryAsString != "")
-      {
+      if(queryAsString != "") {
         rapidjson::Document doc;
         doc.Parse(queryAsString.c_str());
-        if(doc.HasMember("inspect"))
-        {
-          if(doc["inspect"].HasMember("obj"))
-          {
+        if(doc.HasMember("inspect")) {
+          if(doc["inspect"].HasMember("obj")) {
             obj_to_inspect = doc["inspect"]["obj"].GetString();
           }
         }
       }
     }
+#if PCL_MINOR_VERSION == 8
 
     std::vector<rs::Identifiable> mergedClusters;
-    for(int i = 0; i < clusters.size(); ++i)
-    {
+    for(int i = 0; i < clusters.size(); ++i) {
       rs::Cluster &cluster = clusters[i];
 
       ClusterWithParts clusterAsParts;
@@ -295,8 +293,7 @@ private:
       pcl::PointIndicesPtr clusterIndices(new pcl::PointIndices());
       rs::conversion::from(((rs::ReferenceClusterPoints)cluster.points.get()).indices.get(), *clusterIndices);
       if(cluster.source() == "TransparentSegmentation" ||
-              cluster.source() == "ImageSegmentation")
-      {
+         cluster.source() == "ImageSegmentation") {
         mergedClusters.push_back(cluster);
         continue;
       }
@@ -304,20 +301,16 @@ private:
       outInfo("Oversegmented: " << clusterAsParts.partsOfClusters.size());
       clustersWithParts.push_back(clusterAsParts);
 
-      if(clusterAsParts.partsOfClusters.size() > 1)
-      {
+      if(clusterAsParts.partsOfClusters.size() > 1) {
         int idxBiggest = -1;
         int nrOfIndeices = 0;
-        for(int pclClIdx = 0; pclClIdx < clusterAsParts.partsOfClusters.size(); pclClIdx++)
-        {
-          if(clusterAsParts.partsOfClusters[pclClIdx]->indices.size() > nrOfIndeices)
-          {
+        for(int pclClIdx = 0; pclClIdx < clusterAsParts.partsOfClusters.size(); pclClIdx++) {
+          if(clusterAsParts.partsOfClusters[pclClIdx]->indices.size() > nrOfIndeices) {
             nrOfIndeices = clusterAsParts.partsOfClusters[pclClIdx]->indices.size();
             idxBiggest = pclClIdx;
           }
         }
-        for(int pclClIdx = 0; pclClIdx < clusterAsParts.partsOfClusters.size(); pclClIdx++)
-        {
+        for(int pclClIdx = 0; pclClIdx < clusterAsParts.partsOfClusters.size(); pclClIdx++) {
           rs::Cluster newCluster = rs::create<rs::Cluster>(tcas);
           rs::ReferenceClusterPoints rcp = rs::create<rs::ReferenceClusterPoints>(tcas);
           rs::PointIndices uimaIndices = rs::conversion::to(tcas, *clusterAsParts.partsOfClusters[pclClIdx]);
@@ -339,20 +332,21 @@ private:
         }
       }
 
-      else
-      {
+      else {
         mergedClusters.push_back(cluster);
       }
     }
 
     scene.identifiables.set(mergedClusters);
+#else
+    outError("This annotator needs PCL 1.8 to run");
+#endif
     return UIMA_ERR_NONE;
   }
 
   bool callbackKey(const int key, const Source source)
   {
-    switch(key)
-    {
+    switch(key) {
     case 'm':
       dispMode = DisplayMode::MERGED;
       return true;
@@ -369,26 +363,20 @@ private:
     disp = dispRGB.clone();
 
     int colorIdx = 0;
-    for(unsigned int i = 0; i < clustersWithParts.size(); ++i)
-    {
-      if(clustersWithParts[i].partsOfClusters.size() > 1)
-      {
-        for(unsigned int j = 0; j < clustersWithParts[i].partsOfClusters.size(); ++j)
-        {
+    for(unsigned int i = 0; i < clustersWithParts.size(); ++i) {
+      if(clustersWithParts[i].partsOfClusters.size() > 1) {
+        for(unsigned int j = 0; j < clustersWithParts[i].partsOfClusters.size(); ++j) {
           pcl::PointIndicesPtr &indices = clustersWithParts[i].partsOfClusters[j];
-          for(unsigned int k = 0; k < indices->indices.size(); ++k)
-          {
+          for(unsigned int k = 0; k < indices->indices.size(); ++k) {
             int index = indices->indices[k];
             disp.at<cv::Vec3b>(index) = rs::common::cvVec3bColors[colorIdx];
           }
           colorIdx++;
         }
       }
-      else
-      {
+      else {
         pcl::PointIndicesPtr &indices = clustersWithParts[i].partsOfClusters[0];
-        for(unsigned int k = 0; k < indices->indices.size(); ++k)
-        {
+        for(unsigned int k = 0; k < indices->indices.size(); ++k) {
           int index = indices->indices[k];
           disp.at<cv::Vec3b>(index) = rs::common::cvVec3bColors[colorIdx];
         }
@@ -401,19 +389,13 @@ private:
 
   void fillVisualizerWithLock(pcl::visualization::PCLVisualizer &visualizer, const bool firstRun)
   {
-    switch(dispMode)
-    {
-    case DisplayMode::MERGED:
-      {
-        for(unsigned int i = 0; i < clustersWithParts.size(); ++i)
-        {
-          if(clustersWithParts[i].partsOfClusters.size() > 1)
-          {
-            for(unsigned int j = 0; j < clustersWithParts[i].partsOfClusters.size(); ++j)
-            {
+    switch(dispMode) {
+    case DisplayMode::MERGED: {
+        for(unsigned int i = 0; i < clustersWithParts.size(); ++i) {
+          if(clustersWithParts[i].partsOfClusters.size() > 1) {
+            for(unsigned int j = 0; j < clustersWithParts[i].partsOfClusters.size(); ++j) {
               pcl::PointIndicesPtr &indices = clustersWithParts[i].partsOfClusters[j];
-              for(unsigned int k = 0; k < indices->indices.size(); ++k)
-              {
+              for(unsigned int k = 0; k < indices->indices.size(); ++k) {
                 int index = indices->indices[k];
                 cloudPtr_->points[index].rgba = rs::common::colors[j % rs::common::numberOfColors];
               }
@@ -422,12 +404,9 @@ private:
         }
         break;
       }
-    case DisplayMode::SUPERVOX:
-      {
-        for(unsigned int i = 0; i < clustersWithParts.size(); ++i)
-        {
-          for(int j = 0; j < clustersWithParts[i].labeledCloud->points.size(); j++)
-          {
+    case DisplayMode::SUPERVOX: {
+        for(unsigned int i = 0; i < clustersWithParts.size(); ++i) {
+          for(int j = 0; j < clustersWithParts[i].labeledCloud->points.size(); j++) {
             //the beauty of unreadable code...in a nutshell points in the labeled cloud of each cluster
             // are in the same oreder as the indices thus allowing the coloring of the original
             // organized point cloud
@@ -438,13 +417,11 @@ private:
         break;
       }
     }
-    if(firstRun)
-    {
+    if(firstRun) {
       visualizer.addPointCloud(cloudPtr_, std::string("voxel_centroids"));
       visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, pointSize, std::string("voxel_centroids"));
     }
-    else
-    {
+    else {
       visualizer.updatePointCloud(cloudPtr_, std::string("voxel_centroids"));
       visualizer.getPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, pointSize, std::string("voxel_centroids"));
     }
