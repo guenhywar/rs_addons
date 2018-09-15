@@ -50,7 +50,7 @@ private:
   std::vector<std::string> split_model;
 
   //the name of actual_class_label map file in path rs_resources/objects_dataset/extractedFeat/
-  std::string actual_class_label;
+  std::string classNrMapping;
 
   //vector to hold classes name
   std::vector<std::string> model_labels;
@@ -75,16 +75,18 @@ public:
     ctx.extractValue("training_data", trainKNN_matrix);
     outInfo("training_data:" << trainKNN_matrix);
 
-    ctx.extractValue("class_label_mapping", actual_class_label);
-    outInfo("class_label_mapping:" << actual_class_label );
+    ctx.extractValue("class_label_mapping", classNrMapping);
+    outInfo("class_label_mapping:" << classNrMapping );
 
-    knnObject->setLabels(actual_class_label, model_labels);
+
 
     ctx.extractValue("feature_descriptor_type", feature_use);
     outInfo("feature descriptor set: "<<feature_use);
 
     knnObject = new RSKNN(default_k);
     knnObject->loadModelFile(trainKNN_matrix);
+    knnObject->setLabels(classNrMapping, model_labels);
+
     return UIMA_ERR_NONE;
   }
 
