@@ -6,8 +6,8 @@ capabilities:
   outputs: 
     - rs.annotation.Classification: [CupEcoOrange,RedMetalPlateWhiteSpeckles,BluePlasticFork,BluePlasticKnife,RedPlasticKnife,BlueMetalPlateWhiteSpeckles,SiggBottle,ElBrygCoffee,KelloggsCornFlakes,ReineButterMilch,PfannerPfirsichIcetea,VollMilch,SojaMilch,MeerSalz]
 parameters:
-  feature_descriptor_type: BVLC_REF 
-  class_label_mapping: extracted_feats/BVLC_REF_ClassLabel_pnp_15_obj.txt
+  feature_descriptor_type: BVLC_REF  # for now these are BVLC_REF and VFH
+  class_label_mapping: extracted_feats/VFH_ClassLabel_pnp_15_obj.txt
   default_k: 5
   set_mode: CL # CL|GT CL-for adding Classification results; use classifier to semi-automate adding GT to data
-  training_data: extracted_feats/BVLC_REF_data_pnp_15_obj.yaml
+  training_data: extracted_feats/VFH_data_pnp_15_obj.yaml
