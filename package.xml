@@ -14,10 +14,9 @@
 
 <buildtool_depend>catkin</buildtool_depend>
 
- <depend>robosherlock      </depend>
- <depend>simtrack_nodes    </depend>
- <depend>robosherlock_msgs </depend>
- <depend>json_prolog       </depend>
+ <depend>robosherlock</depend>
+ <depend>robosherlock_msgs</depend>
+ <depend>json_prolog</depend>
 
 <export>
 </export>

@@ -109,12 +109,19 @@ void readClassLabel(std::string obj_file_path,
 }
 
 //To read all the objects from rs_resources/objects_dataset folder.....................
-void getFiles(const std::string &resourchPath,
+void getFiles(const std::string &input_folder,
               std::vector <std::pair < string, double> > object_label,
               std::map<double, std::vector<std::string> > &modelFiles,
               std::string file_extension)
 {
-  std::string path_to_data = resourchPath + "/objects_dataset/object_data/";
+  std::string path_to_data;
+  if(boost::filesystem::exists(input_folder)) {
+    path_to_data = input_folder;
+  }
+  else {
+    std::string path_to_rs_resources = ros::package::getPath("rs_resources");
+    path_to_data = path_to_rs_resources + "/objects_dataset/object_data/";
+  }
   std::cerr << "______________________" << std::endl;
   std::cerr << path_to_data << std::endl;
 
@@ -155,7 +162,7 @@ void getFiles(const std::string &resourchPath,
           std::string filename = objDirIt->path().string();
           pos = filename.rfind(file_extension.c_str());
           if(pos != std::string::npos) {
-              modelFiles[p.second].push_back(objDirIt->path().string());
+            modelFiles[p.second].push_back(objDirIt->path().string());
           }
         }
         objDirIt++;
@@ -314,9 +321,9 @@ void descriptorsSplit(std::vector<std::pair<double, std::vector<float> > > featu
 // To save the train and test data in cv::Mat format in folder /rs_resource/extractedFeat
 void saveDatasets(std::vector<std::pair<double, std::vector<float> > > data,
                   std::string descriptor_name,
-                  std::string split_filename, std::string savePathToOutput)
+                  std::string split_name, std::string savePathToOutput)
 {
-  if(data.size()==0) return;
+  if(data.size() == 0) return;
   cv::Mat descriptors_train(data.size(), data[0].second.size(), CV_32F);
   cv::Mat label_train(data.size(), 1, CV_32F);
 
@@ -331,7 +338,7 @@ void saveDatasets(std::vector<std::pair<double, std::vector<float> > > data,
   //To save file in disk...........................................................
   cv::FileStorage fs;
   // To save the train data.................................................
-  fs.open(savePathToOutput + descriptor_name + '_' + "data" + '_' + split_filename + ".yaml", cv::FileStorage::WRITE);
+  fs.open(savePathToOutput + "/" + descriptor_name + '_' + "data_"+split_name +".yaml", cv::FileStorage::WRITE);
   fs << "label" << label_train;
   fs << "descriptors" << descriptors_train;
   fs.release();
@@ -340,9 +347,9 @@ void saveDatasets(std::vector<std::pair<double, std::vector<float> > > data,
 }
 
 void saveObjectToLabels(std::vector <std::pair < string, double> > input_file, std::string descriptor_name,
-                        std::string xml_filename, std::string savePathToOutput)
+                        std::string split_name, std::string savePathToOutput)
 {
-  std::ofstream file((savePathToOutput + descriptor_name + '_' + "ClassLabel" + '_' + xml_filename + ".txt").c_str());
+  std::ofstream file((savePathToOutput + "/" +descriptor_name + '_' + "ClassLabel_"+split_name+ ".txt").c_str());
   for(auto p : input_file) {
     file << p.first << ":" << p.second << endl;
   }
@@ -352,13 +359,17 @@ void saveObjectToLabels(std::vector <std::pair < string, double> > input_file, s
 int main(int argc, char **argv)
 {
   po::options_description desc("Allowed options");
-  std::string split_name, feat;
+  std::string split_file, feat, input_folder, output_folder, split_name;
   desc.add_options()
   ("help,h", "Print help messages")
-  ("split,s", po::value<std::string>(& split_name)->default_value("breakfast3"),
+  ("split,s", po::value<std::string>(&split_file)->default_value("breakfast3"),
    "enter the split file name")
   ("feature,f", po::value<std::string>(&feat)->default_value("BVLC_REF"),
-   "choose feature to extract: [BVLC_REF|VGG16|VFH|CVFH]");
+   "choose feature to extract: [BVLC_REF|VGG16|VFH|CVFH]")
+  ("input,i", po::value<std::string>(&input_folder)->default_value(""),
+   "set input location for image data")
+  ("output,o", po::value<std::string>(&output_folder)->default_value(""),
+   "set output location");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
@@ -371,7 +382,12 @@ int main(int argc, char **argv)
   // Define path to get the datasets.......................................................
   std::string resourcePath = ros::package::getPath("rs_resources");
   std::string split_file_path ;
-  split_file_path = resourcePath + "/objects_dataset/splits/" + split_name + ".yaml";
+  if(bfs::exists(bfs::path(split_file))) {
+    split_file_path = split_file;
+  }
+  else {
+    split_file_path = resourcePath + "/objects_dataset/splits/" + split_file;
+  }
 
   if(!bfs::exists(bfs::path(split_file_path))) {
     std::cout << "*********************************************************************************************" << std::endl;
@@ -380,15 +396,26 @@ int main(int argc, char **argv)
     std::cerr << "The file should be in ( rs_resources/objects_datasets/splits/ ) folder " << std::endl << std::endl;
     return EXIT_FAILURE;
   }
+
+  bfs::path p(split_file_path);
+  split_name = p.stem().string();
   std::cout << "Path to split file : " << split_file_path << std::endl;
 
   //To save file in disk...........................................................
-  std::string savePathToOutput = resourcePath + "/extracted_feats/";
+  std::string savePathToOutput;
+  if(bfs::exists(output_folder)) {
+    savePathToOutput = output_folder;
+  }
+  else {
+    savePathToOutput = resourcePath + "/extracted_feats/";
+  }
 
   // To check the storage folder for generated files by this program ................................................
   if(!bfs::exists(savePathToOutput)) {
-    boost::filesystem::create_directory(savePathToOutput);
-    std::cerr << savePathToOutput << "created" << std::endl;
+    //   boost::filesystem::create_directory(savePathToOutput);
+
+    std::cerr << savePathToOutput << "output folder does not exist!" << std::endl;
+    exit(1);
   }
 
   std::cout << "Path to save the extracted feature : " << savePathToOutput << std::endl << std::endl;
@@ -411,7 +438,7 @@ int main(int argc, char **argv)
 #ifdef WITH_CAFFE
     std::cout << "Calculation starts with :" << "::" << feat << std::endl;
     // To read all .png files from the storage folder...........
-    getFiles(resourcePath, objectToLabel, model_files_all, "_crop.png");
+    getFiles(input_folder, objectToLabel, model_files_all, "_crop.png");
     extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
 #else
     std::cerr << "Caffe not available." << std::endl;
@@ -421,7 +448,7 @@ int main(int argc, char **argv)
   else if(feat == "VFH" || feat == "CVFH") {
     std::cout << "Calculation starts with :" << "::" << feat << std::endl;
     // To read all .cpd files from the storage folder...........
-    getFiles(resourcePath, objectToLabel, model_files_all, ".pcd");
+    getFiles(input_folder, objectToLabel, model_files_all, ".pcd");
     // To calculate VFH descriptors..................................
     extractPCLDescriptors(feat, model_files_all, descriptors_all);
   }
