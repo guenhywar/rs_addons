@@ -236,7 +236,13 @@ void extractPCLDescriptors(std::string descriptorType,
       for(size_t j = 0; j < 308; ++j) {
         descriptorVec[j] = extractedDiscriptor->points[0].histogram[j];
       }
-      extract_features.push_back(std::pair<double, std::vector<float> >(it->first, descriptorVec));
+
+      cv::Mat desc(1, descriptorVec.size(), CV_32F, &descriptorVec[0]);
+      cv::normalize(desc, desc, 1, 0, cv::NORM_L2);
+      std::vector<float> descNormed;
+      descNormed.assign((float *)desc.datastart, (float *)desc.dataend);
+
+      extract_features.push_back(std::pair<double, std::vector<float> >(it->first, descNormed));
     }
   }
   std::cerr << featDescription << extract_features.size() << std::endl;
