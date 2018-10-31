@@ -133,9 +133,6 @@
     <delegateAnalysisEngine key="RegionFilter">
       <import location="../../../robosherlock/descriptors/annotators/filter/RegionFilter.xml"/>
     </delegateAnalysisEngine>
-    <delegateAnalysisEngine key="ResultAdvertiser">
-      <import location="../../../robosherlock/descriptors/annotators/io/ResultAdvertiser.xml"/>
-    </delegateAnalysisEngine>
     <delegateAnalysisEngine key="RfAnnotator">
       <import location="../annotators/RfAnnotator.xml"/>
     </delegateAnalysisEngine>
@@ -213,26 +210,25 @@
     </configurationParameterSettings>
     <flowConstraints>
       <fixedFlow>
-        <node>CollectionReader</node>
-        <node>ImagePreprocessor</node>
-        <node>PointCloudFilter</node>
-        <node>NormalEstimator</node>
-        <node>PlaneAnnotator</node>
-        <node>PointCloudClusterExtractor</node>
-        <node>ImageSegmentationAnnotator</node>
-        <node>ClusterMerger</node>
-        <node>UnrealGTAnnotator</node>
-<!--        <node>Cluster3DGeometryAnnotator</node>
+      <node>CollectionReader</node>
+      <node>ImagePreprocessor</node>
+<!--      <node>RegionFilter</node>-->
+      <node>NormalEstimator</node>
+      <node>PlaneAnnotator</node>
+      <node>ImageSegmentationAnnotator</node>
+      <node>PointCloudClusterExtractor</node>
+<!--      <node>ClusterMerger</node>-->
+      <node>UnrealGTAnnotator</node>
+      <node>Cluster3DGeometryAnnotator</node>
         <node>PrimitiveShapeAnnotator</node>
         <node>ClusterColorHistogramCalculator</node>
         <node>GogglesAnnotator</node>
         <node>CaffeAnnotator</node>
-        <node>KnnAnnotator</node>   --><!--CNN Features -->
-<!--        <node>PCLFeatureExtractor</node>
-        <node>RfAnnotator</node> -->   <!--VFH Features -->
-<!--        <node>SVMAnnotator</node>-->
-<!--        <node>ResultAdvertiser</node>-->
-<!--        <node>MLNInferencer</node>-->
+        <node>PCLFeatureExtractor</node>
+        <node>RfAnnotator</node>   <!--Shape Features -->
+        <node>SvmAnnotator</node>  <!--Instance Features-->
+        <node>MLNInferencer</node>
+<!--        <node>StorageWriter</node>-->
       </fixedFlow>
     </flowConstraints>
     <typePriorities/>

@@ -48,7 +48,9 @@
         <name>trained_model_name</name>
         <description>train_model_name can be found in path /rs_addons/trainedData/ </description>
         <value>        
-          <string>IAI_CNN_rsrfModel_objects</string>
+<!--          <string>IAI_CNN_RFModel_unreal</string>-->
+<!--          <string>IAI_CNN_RFModel_classes</string>-->
+          <string>WU_VFH_rsrfModel_objectWU6</string>
         </value>
       </nameValuePair>
 
@@ -57,7 +59,9 @@
         <description>actual_class_label can be found in path /rs_resources/objects_dataset/extractedFeat/,
         which is object to class map </description> 
         <value>   
-          <string>IAI_CNN_ClassLabel_objects</string>
+<!--          <string>IAI_CNN_ClassLabel_unreal</string>-->
+<!--          <string>IAI_CNN_ClassLabel_classes</string>-->
+          <string>WU_VFH_ClassLabel_objectWU6</string>
         </value>
       </nameValuePair>
     </configurationParameterSettings>
