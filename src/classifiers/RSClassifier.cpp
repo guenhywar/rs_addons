@@ -187,12 +187,12 @@ void RSClassifier::drawCluster(cv::Mat input, cv::Rect rect, const std::string &
 }
 
 void  RSClassifier::processPCLFeature(std::string memory_name, std::string set_mode, std::string feature_use,
-                                      std::vector<rs::Cluster> clusters, RSClassifier *obj_VFH, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
+                                      std::vector<rs::ObjectHypothesis> clusters, RSClassifier *obj_VFH, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
   outInfo("Number of cluster:" << clusters.size() << std::endl);
 
   for(size_t i = 0; i < clusters.size(); ++i) {
-    rs::Cluster &cluster = clusters[i];
+    rs::ObjectHypothesis &cluster = clusters[i];
     std::vector<rs::PclFeature> features;
     cluster.annotations.filter(features);
 
@@ -230,14 +230,14 @@ void  RSClassifier::processPCLFeature(std::string memory_name, std::string set_m
 
 //the function process and classify RGB images, which run from a .bag file.
 void  RSClassifier::processCaffeFeature(std::string memory_name, std::string set_mode, std::string feature_use,
-                                        std::vector<rs::Cluster> clusters,
+                                        std::vector<rs::ObjectHypothesis> clusters,
                                         RSClassifier *obj_caffe, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
   //clusters comming from RS pipeline............................
   outInfo("Number of cluster:" << clusters.size() << std::endl);
 
   for(size_t i = 0; i < clusters.size(); ++i) {
-    rs::Cluster &cluster = clusters[i];
+    rs::ObjectHypothesis &cluster = clusters[i];
     std::vector<rs::Features> features;
     cluster.annotations.filter(features);
 

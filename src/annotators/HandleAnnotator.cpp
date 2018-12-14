@@ -215,7 +215,7 @@ public:
     getSemanticMapEntries(cas, "Handle", handles);
     for(int i = 0; i < handle_indices.size(); ++i)
     {
-      rs::Cluster c = rs::create<rs::Cluster>(tcas);
+      rs::ObjectHypothesis c = rs::create<rs::ObjectHypothesis>(tcas);
       Cluster cluster;
       cluster.indicesIndex = i;
       createImageRoi(cluster);

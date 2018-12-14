@@ -138,7 +138,7 @@ public:
       }
     }
     rs::Scene scene = cas.getScene();
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     std::vector<rs::Plane> planes;
     scene.identifiables.filter(clusters);
     scene.annotations.filter(planes);
@@ -165,7 +165,7 @@ public:
 
     for(int i = 0; i < clusters.size(); ++i)
     {
-      rs::Cluster &cluster = clusters[i];
+      rs::ObjectHypothesis &cluster = clusters[i];
       if(!cluster.points.has())
       {
         continue;

@@ -17,7 +17,7 @@
  <depend>robosherlock</depend>
  <depend>robosherlock_msgs</depend>
  <depend>json_prolog</depend>
-
+ <depend>rapidjson_ros</depend>
 <export>
 </export>
 

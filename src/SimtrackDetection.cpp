@@ -163,7 +163,7 @@ private:
         {
           simtrack_nodes::SimtrackDetection &simtrackDetection = srv.response.detections.at(i);
           outInfo("Found object: " << simtrackDetection.model_name);
-          rs::Cluster simtrackCluster = rs::create<rs::Cluster>(tcas);
+          rs::ObjectHypothesis simtrackCluster = rs::create<rs::ObjectHypothesis>(tcas);
           simtrackCluster.source.set("Simtrack");
           rs::PoseAnnotation poseAnnotation = rs::create<rs::PoseAnnotation>(tcas);
           rs::Detection detection = rs::create<rs::Detection>(tcas);

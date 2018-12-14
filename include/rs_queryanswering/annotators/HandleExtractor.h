@@ -39,6 +39,8 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/filters/project_inliers.h>
 #include <pcl/surface/convex_hull.h>
+#include <pcl/surface/impl/convex_hull.hpp>
+
 #include <pcl/segmentation/extract_polygonal_prism_data.h>
 #include <pcl/segmentation/organized_multi_plane_segmentation.h>
 #include <pcl/io/pcd_io.h>
@@ -48,7 +50,7 @@
 
 #include <tf/tf.h>
 
-#include<rs/utils/output.h>
+#include <rs/utils/output.h>
 
 namespace rs
 {

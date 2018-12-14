@@ -6,5 +6,5 @@ capabilities:
   - rs.pcl.PointCloud
   - rs.pcl.NormalsCloud
   outputs:
-  - rs.annotation.Detection
+  - rs.annotation.Detection: ['Handle']
 parameters: {}

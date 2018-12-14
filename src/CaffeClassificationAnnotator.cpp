@@ -27,7 +27,7 @@ class CaffeClassificationAnnotator : public DrawingAnnotator
 private:
 
   cv::Mat color;
-  std::vector<rs::Cluster> clusters;
+  std::vector<rs::ObjectHypothesis> clusters;
   std::vector<cv::Rect> clusterRois;
   cv::Mat caffeImage;
   std::vector<std::vector<Prediction>> predictionsAllClusters;

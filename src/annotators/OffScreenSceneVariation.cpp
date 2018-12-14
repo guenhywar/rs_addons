@@ -480,7 +480,7 @@ public:
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
 
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     scene.identifiables.filter(clusters);
     outInfo("Found " << clusters.size() << " object hypotheses");
 
@@ -610,7 +610,7 @@ public:
             outError("Found: " << o.first << ":" << points.size());
             if(points.size() > 0)
             {
-              rs::Cluster uimaCluster = rs::create<rs::Cluster>(tcas);
+              rs::ObjectHypothesis uimaCluster = rs::create<rs::ObjectHypothesis>(tcas);
               rs::ReferenceClusterPoints rcp = rs::create<rs::ReferenceClusterPoints>(tcas);
               pcl::PointIndices indices;
               cv::Mat mask_full = cv::Mat::zeros(rgb_.rows, rgb_.cols, CV_8U);

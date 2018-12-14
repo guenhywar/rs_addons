@@ -250,7 +250,7 @@ private:
 
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     std::vector<rs::Plane> planes;
     clustersWithParts.clear();
 
@@ -287,7 +287,7 @@ private:
 
     std::vector<rs::Identifiable> mergedClusters;
     for(int i = 0; i < clusters.size(); ++i) {
-      rs::Cluster &cluster = clusters[i];
+      rs::ObjectHypothesis &cluster = clusters[i];
 
       ClusterWithParts clusterAsParts;
 
@@ -313,7 +313,7 @@ private:
           }
         }
         for(int pclClIdx = 0; pclClIdx < clusterAsParts.partsOfClusters.size(); pclClIdx++) {
-          rs::Cluster newCluster = rs::create<rs::Cluster>(tcas);
+          rs::ObjectHypothesis newCluster = rs::create<rs::ObjectHypothesis>(tcas);
           rs::ReferenceClusterPoints rcp = rs::create<rs::ReferenceClusterPoints>(tcas);
           rs::PointIndices uimaIndices = rs::conversion::to(tcas, *clusterAsParts.partsOfClusters[pclClIdx]);
           rcp.indices.set(uimaIndices);

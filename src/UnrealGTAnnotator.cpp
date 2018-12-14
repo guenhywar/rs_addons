@@ -111,7 +111,7 @@ public:
 
     std::vector<rs::Identifiable> cleanedClusters;
 
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     scene.identifiables.filter(clusters);
 
     outInfo("Found " << clusters.size() << " clusters");

@@ -133,12 +133,12 @@ std::pair<double,double> RSKNN::classifyOnLiveDataKNN(cv::Mat test_mat)
 }
 
 void  RSKNN::processPCLFeatureKNN(std::string set_mode, std::string feature_use,
-                                  std::vector<rs::Cluster> clusters, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
+                                  std::vector<rs::ObjectHypothesis> clusters, cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
   outInfo("Number of cluster:" << clusters.size());
 
   for(size_t i = 0; i < clusters.size(); ++i) {
-    rs::Cluster &cluster = clusters[i];
+    rs::ObjectHypothesis &cluster = clusters[i];
     std::vector<rs::PclFeature> features;
     cluster.annotations.filter(features);
 
@@ -176,14 +176,14 @@ void  RSKNN::processPCLFeatureKNN(std::string set_mode, std::string feature_use,
   }
 }
 
-void  RSKNN::processCaffeFeatureKNN(std::string set_mode, std::string feature_use, std::vector<rs::Cluster> clusters,
+void  RSKNN::processCaffeFeatureKNN(std::string set_mode, std::string feature_use, std::vector<rs::ObjectHypothesis> clusters,
                                     cv::Mat &color, std::vector<std::string> models_label, uima::CAS &tcas)
 {
   //clusters comming from RS pipeline............................
   outInfo("Number of cluster:" << clusters.size() << std::endl);
 
   for(size_t i = 0; i < clusters.size(); ++i) {
-    rs::Cluster &cluster = clusters[i];
+    rs::ObjectHypothesis &cluster = clusters[i];
     std::vector<rs::Features> features;
     cluster.annotations.filter(features);
 
@@ -221,7 +221,7 @@ void  RSKNN::processCaffeFeatureKNN(std::string set_mode, std::string feature_us
   }
 }
 
-void RSKNN::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::Cluster &cluster, std::string set_mode, double &confi)
+void RSKNN::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::ObjectHypothesis &cluster, std::string set_mode, double &confi)
 {
   rs::Classification classResult = rs::create<rs::Classification>(tcas);
   classResult.classname.set(class_name);
