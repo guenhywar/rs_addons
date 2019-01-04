@@ -309,12 +309,15 @@ public:
       obj.annotations.filter(detections);
       outInfo("Detections: " << detections.size());
       std::vector<rs::Geometry> geom;
+      std::vector<rs::PoseAnnotation> poses;
       obj.annotations.filter(geom);
-      if(!geom.empty())
+      obj.annotations.filter(poses);
+      if(!geom.empty() && !poses.empty())
       {
         rs::Geometry &g = geom[0];
+	rs::PoseAnnotation &p = poses[0];
         tf::Stamped<tf::Pose> pose;
-        rs::conversion::from(g.world(), pose);
+        rs::conversion::from(p.world(), pose);
         marker.pose.position.x = pose.getOrigin().x();
         marker.pose.position.y = pose.getOrigin().y();
         marker.pose.position.z = pose.getOrigin().z();
