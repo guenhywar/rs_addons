@@ -5,7 +5,6 @@
 //RS
 #include <rs/scene_cas.h>
 #include <rs/utils/time.h>
-#include <rs/queryanswering/KRDefinitions.h>
 #include <json_prolog/prolog.h>
 
 using namespace uima;

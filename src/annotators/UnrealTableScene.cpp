@@ -18,7 +18,6 @@
 #include <rs/utils/common.h>
 #include <rs/io/TFBroadcasterWrapper.hpp>
 #include <rs/DrawingAnnotator.h>
-#include <rs/queryanswering/KRDefinitions.h>
 #include <rs/io/Storage.h>
 
 //ROS

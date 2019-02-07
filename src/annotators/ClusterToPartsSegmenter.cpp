@@ -27,7 +27,6 @@
 
 #endif
 
-#include <rs/queryanswering/KRDefinitions.h>
 #include <rs/queryanswering/JsonPrologInterface.h>
 
 #include <rapidjson/rapidjson.h>
