@@ -112,7 +112,8 @@ void readClassLabel(std::string obj_file_path,
 void getFiles(const std::string &input_folder,
               std::vector <std::pair < string, double> > object_label,
               std::map<double, std::vector<std::string> > &modelFiles,
-              std::string file_extension)
+              std::string file_extension,
+              const int skip_count=1)
 {
   std::string path_to_data;
   if(boost::filesystem::exists(input_folder)) {
@@ -157,12 +158,15 @@ void getFiles(const std::string &input_folder,
     }
     try {
       boost::filesystem::directory_iterator objDirIt(pathToObj);
+      int idx =1;
       while(objDirIt != boost::filesystem::directory_iterator{}) {
         if(boost::filesystem::is_regular_file(objDirIt->path())) {
           std::string filename = objDirIt->path().string();
           pos = filename.rfind(file_extension.c_str());
           if(pos != std::string::npos) {
-            modelFiles[p.second].push_back(objDirIt->path().string());
+            if(idx%skip_count==0)
+                modelFiles[p.second].push_back(objDirIt->path().string());
+            idx++;
           }
         }
         objDirIt++;
@@ -366,6 +370,7 @@ int main(int argc, char **argv)
 {
   po::options_description desc("Allowed options");
   std::string split_file, feat, input_folder, output_folder, split_name;
+  int leave_count;
   desc.add_options()
   ("help,h", "Print help messages")
   ("split,s", po::value<std::string>(&split_file)->default_value("breakfast3"),
@@ -375,7 +380,8 @@ int main(int argc, char **argv)
   ("input,i", po::value<std::string>(&input_folder)->default_value(""),
    "set input location for image data")
   ("output,o", po::value<std::string>(&output_folder)->default_value(""),
-   "set output location");
+   "set output location")
+  ("leave_out,l", po::value<int>(&leave_count)->default_value(1), "if x>1 take only every x_th file for extractions");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
@@ -384,6 +390,8 @@ int main(int argc, char **argv)
     std::cout << desc << "\n";
     return 1;
   }
+
+
 
   // Define path to get the datasets.......................................................
   std::string resourcePath = ros::package::getPath("rs_resources");
@@ -444,7 +452,7 @@ int main(int argc, char **argv)
 #ifdef WITH_CAFFE
     std::cout << "Calculation starts with :" << "::" << feat << std::endl;
     // To read all .png files from the storage folder...........
-    getFiles(input_folder, objectToLabel, model_files_all, "_crop.png");
+    getFiles(input_folder, objectToLabel, model_files_all, "_crop.png", leave_count);
     extractCaffeFeature(feat, model_files_all, resourcePath, descriptors_all);
 #else
     std::cerr << "Caffe not available." << std::endl;
@@ -454,7 +462,7 @@ int main(int argc, char **argv)
   else if(feat == "VFH" || feat == "CVFH") {
     std::cout << "Calculation starts with :" << "::" << feat << std::endl;
     // To read all .cpd files from the storage folder...........
-    getFiles(input_folder, objectToLabel, model_files_all, ".pcd");
+    getFiles(input_folder, objectToLabel, model_files_all, ".pcd", leave_count);
     // To calculate VFH descriptors..................................
     extractPCLDescriptors(feat, model_files_all, descriptors_all);
   }
