@@ -57,7 +57,7 @@ public:
   void evaluation(std::vector<int> test_label, std::vector<int> predicted_label,std::string obj_classInDouble);
 
   //probably draws a cluster on the image
-  void drawCluster(cv::Mat input , cv::Rect rect, const std::string &label);
+  void drawCluster(cv::Mat input , cv::Rect rect, const std::string &label, double confidence = 1.0);
 
   //what is this?
   void  processPCLFeature(std::string memory_name,std::string set_mode, std::string feature_use,

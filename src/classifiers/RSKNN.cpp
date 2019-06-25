@@ -214,7 +214,7 @@ void  RSKNN::processCaffeFeatureKNN(std::string set_mode, std::string feature_us
         rs::conversion::from(image_roi.roi_hires.get(), rect);
 
         //Draw result on image...........................
-        drawCluster(color, rect, classLabelInString);
+        drawCluster(color, rect, classLabelInString, confidence);
       }
       outInfo("calculation is done");
     }

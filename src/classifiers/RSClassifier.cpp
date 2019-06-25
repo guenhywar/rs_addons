@@ -177,8 +177,11 @@ std::string RSClassifier::loadTrained(std::string trained_file_name)
   return a;
 }
 
-void RSClassifier::drawCluster(cv::Mat input, cv::Rect rect, const std::string &label)
+void RSClassifier::drawCluster(cv::Mat input, cv::Rect rect, const std::string &l, double confidence)
 {
+  std::stringstream ss;
+  ss<<l<<" "<<confidence;
+  std::string label = ss.str();
   cv::rectangle(input, rect, CV_RGB(0, 255, 0), 2);
   int offset = 15;
   int baseLine;
