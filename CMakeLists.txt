@@ -33,8 +33,8 @@ find_package(catkin REQUIRED robosherlock
     message_runtime
     ${OPTIONAL_simtrack}
     ${OPTIONAL_json_prolog}
-    tf_conversions
-    robosherlock_msgs
+    #tf_conversions
+    #robosherlock_msgs
     )
 
 ################################################################################
@@ -116,7 +116,7 @@ endif(Caffe_FOUND)
 
 add_executable(featureExtractor src/tools/feature_extractor.cpp)
 target_link_libraries(featureExtractor
-	${PCL_LIBRARIES}
+  ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${Boost_LIBRARIES}
