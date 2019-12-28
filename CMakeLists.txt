@@ -33,8 +33,6 @@ find_package(catkin REQUIRED robosherlock
     message_runtime
     ${OPTIONAL_simtrack}
     ${OPTIONAL_json_prolog}
-    #tf_conversions
-    #robosherlock_msgs
     )
 
 ################################################################################
