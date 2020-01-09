@@ -2,12 +2,12 @@
 #include <uima/api.hpp>
 
 // RS
-#include <rs/DrawingAnnotator.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/output.h>
-#include <rs/utils/time.h>
-#include <rs/utils/common.h>
-#include <rs/conversion/bson.h>
+#include <robosherlock/DrawingAnnotator.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/output.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/utils/common.h>
+#include <robosherlock/conversion/bson.h>
 
 // PCL
 #include <pcl/pcl_config.h>
@@ -27,7 +27,7 @@
 
 #endif
 
-#include <rs/queryanswering/JsonPrologInterface.h>
+#include <robosherlock/queryanswering/JsonPrologInterface.h>
 
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>

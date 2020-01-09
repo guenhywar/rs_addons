@@ -41,11 +41,11 @@
 #include <tf_conversions/tf_eigen.h>
 #include <tf/tf.h>
 
-#include <rs/scene_cas.h>
+#include <robosherlock/scene_cas.h>
 #include <rs_queryanswering/annotators/HandleExtractor.h>
-#include <rs/utils/time.h>
+#include <robosherlock/utils/time.h>
 
-#include <rs/DrawingAnnotator.h>
+#include <robosherlock/DrawingAnnotator.h>
 
 
 using namespace uima;
