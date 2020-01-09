@@ -19,7 +19,6 @@ find_package(aruco QUIET)
 find_package(MPI QUIET)
 find_package(RapidJSON REQUIRED) 
 
-
 if(Caffe_FOUND)
     add_definitions(-DWITH_CAFFE)
     message(STATUS "OPTIONAL MODULE Caffe FOUND")
@@ -36,6 +35,9 @@ find_package(catkin REQUIRED robosherlock
     tf_conversions
     robosherlock_msgs
     )
+
+message(status " RS built with google googgles: " ${RS_WITH_GG})
+message(status " RS built with Caffe: " ${RS_WITH_CAFFE})
 
 ################################################################################
 ## Constants for project                                                      ##
@@ -100,7 +102,7 @@ else(aruco_FOUND)
     message(WARNING "Aruco not found. AR Markers Detector will NOT be built")
 endif(aruco_FOUND)
 
-if(Caffe_FOUND)
+if(Caffe_FOUND AND RS_WITH_CAFFE)
   rs_add_library(rs_caffeClassification src/CaffeClassificationAnnotator.cpp)
   target_link_libraries(rs_caffeClassification
         ${catkin_LIBRARIES}
@@ -112,11 +114,11 @@ if(Caffe_FOUND)
         ${PCL_LIBRARIES}
         ${Caffe_LIBRARIES}
         )
-endif(Caffe_FOUND)
+endif()
 
 add_executable(featureExtractor src/tools/feature_extractor.cpp)
 target_link_libraries(featureExtractor
-	${PCL_LIBRARIES}
+  ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${Boost_LIBRARIES}
