@@ -101,7 +101,7 @@ public:
     outInfo("RSKNNAnnotator is running:");
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
-    cas.get(VIEW_COLOR_IMAGE_HD, color);
+    cas.get(VIEW_COLOR_IMAGE, color);
     std::vector<rs::ObjectHypothesis> clusters;
     scene.identifiables.filter(clusters);
     outInfo("Feature to use: "<<feature_use);

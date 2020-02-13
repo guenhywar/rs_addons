@@ -166,7 +166,7 @@ void  RSKNN::processPCLFeatureKNN(std::string set_mode, std::string feature_use,
       //set roi on image
       rs::ImageROI image_roi = cluster.rois.get();
       cv::Rect rect;
-      rs::conversion::from(image_roi.roi_hires.get(), rect);
+      rs::conversion::from(image_roi.roi.get(), rect);
 
       //Draw result on image...........
       drawCluster(color, rect, classLabelInString);
@@ -211,7 +211,7 @@ void  RSKNN::processCaffeFeatureKNN(std::string set_mode, std::string feature_us
         //set roi on image
         rs::ImageROI image_roi = cluster.rois.get();
         cv::Rect rect;
-        rs::conversion::from(image_roi.roi_hires.get(), rect);
+        rs::conversion::from(image_roi.roi.get(), rect);
 
         //Draw result on image...........................
         drawCluster(color, rect, classLabelInString, confidence);
