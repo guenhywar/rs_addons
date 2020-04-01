@@ -1,7 +1,3 @@
-//RS
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-
 #include <uima/api.hpp>
 
 // Boost
@@ -10,15 +6,15 @@
 #include <boost/filesystem/path.hpp>
 
 //RS
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/io/UnrealVisionBridge.h>
-#include <rs/utils/output.h>
-#include <rs/utils/common.h>
-#include <rs/io/TFBroadcasterWrapper.hpp>
-#include <rs/DrawingAnnotator.h>
-#include <rs/io/Storage.h>
+#include <robosherlock/types/all_types.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/io/UnrealVisionBridge.h>
+#include <robosherlock/utils/output.h>
+#include <robosherlock/utils/common.h>
+#include <robosherlock/io/TFBroadcasterWrapper.hpp>
+#include <robosherlock/DrawingAnnotator.h>
+#include <robosherlock/io/Storage.h>
 
 //ROS
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
