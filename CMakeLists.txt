@@ -20,7 +20,7 @@ find_package(aruco QUIET)
 find_package(MPI QUIET)
 find_package(RapidJSON REQUIRED) 
 
-find_package(Boost REQUIRED COMPONENTS python)
+find_package(Boost REQUIRED COMPONENTS python numpy)
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
@@ -70,6 +70,7 @@ catkin_package(
 include_directories(
     ${RapidJSON_INCLUDE_DIRS}
     ${RS_ADDONS_INCLUDE_DIRS_LIST}
+    ${Boost_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     )
 
