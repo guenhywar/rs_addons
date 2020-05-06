@@ -31,11 +31,11 @@
 
 #include <ctype.h>
 
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/utils/output.h>
-#include <rs/DrawingAnnotator.h>
-#include <rs/utils/common.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/utils/output.h>
+#include <robosherlock/DrawingAnnotator.h>
+#include <robosherlock/utils/common.h>
 
 #include <simtrack_nodes/GetDetections.h>
 #include <simtrack_nodes/SwitchObjects.h>
@@ -163,7 +163,7 @@ private:
         {
           simtrack_nodes::SimtrackDetection &simtrackDetection = srv.response.detections.at(i);
           outInfo("Found object: " << simtrackDetection.model_name);
-          rs::Cluster simtrackCluster = rs::create<rs::Cluster>(tcas);
+          rs::ObjectHypothesis simtrackCluster = rs::create<rs::ObjectHypothesis>(tcas);
           simtrackCluster.source.set("Simtrack");
           rs::PoseAnnotation poseAnnotation = rs::create<rs::PoseAnnotation>(tcas);
           rs::Detection detection = rs::create<rs::Detection>(tcas);

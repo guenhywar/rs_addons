@@ -20,10 +20,10 @@
 #include <opencv2/ml.hpp>
 #endif
 
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/DrawingAnnotator.h>
+#include <robosherlock/types/all_types.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/DrawingAnnotator.h>
 
 #include <rs_addons/classifiers/RSClassifier.h>
 
@@ -44,7 +44,7 @@ public:
 
   void classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_mat, double &det, double &confi);
 
-  void annotate_hypotheses (uima::CAS &tcas, std::string class_name, std::string feature_name, rs::Cluster &cluster, std::string set_mode, double &confi);
+  void annotate_hypotheses (uima::CAS &tcas, std::string class_name, std::string feature_name, rs::ObjectHypothesis &cluster, std::string set_mode, double &confi);
 
   ~RSSVM();
 };

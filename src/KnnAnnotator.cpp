@@ -18,10 +18,10 @@
 
 #include <ros/package.h>
 
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/DrawingAnnotator.h>
+#include <robosherlock/types/all_types.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/DrawingAnnotator.h>
 
 #include <rs_addons/classifiers/RSKNN.h>
 
@@ -102,7 +102,7 @@ public:
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
     cas.get(VIEW_COLOR_IMAGE_HD, color);
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     scene.identifiables.filter(clusters);
     outInfo("Feature to use: "<<feature_use);
     if(feature_use == "VFH" || feature_use == "CVFH") {

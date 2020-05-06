@@ -92,10 +92,10 @@ void RSRF::trainModel(std::string train_matrix_name, std::string train_label_nam
     rtree->setUseSurrogates(false);
     rtree->setMaxCategories(15);
     rtree->setPriors(cv::Mat());
-    rtree->setCalculateVarImportance(false);
+    rtree->setCalculateVarImportance(true);
     //TODO: number of variables randomly selected at node and used to find the best split(s) is missing
     //rtree->setCVFolds(4);
-    rtree->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 100, 0.01f)); //termination criteria, max # of trees, forest accuracy
+    rtree->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 1000, 0.01f)); //termination criteria, max # of trees, forest accuracy
 
     rtree->train(trainData);
     //rtree->train(train_matrix, cv::ml::ROW_SAMPLE, train_label);
@@ -229,7 +229,7 @@ void RSRF::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test_
 //     confi=con;
 }
 
-void RSRF::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::Cluster &cluster, std::string set_mode, double &confi)
+void RSRF::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::ObjectHypothesis &cluster, std::string set_mode, double &confi)
 {
     rs::ClassConfidence conResult = rs::create<rs::ClassConfidence>(tcas);
     conResult.score.set(confi);

@@ -15,14 +15,14 @@
 #include <caffe/caffe.hpp>
 
 //RS
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/DrawingAnnotator.h>
+#include <robosherlock/types/all_types.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/DrawingAnnotator.h>
 
 #include <ros/package.h>
 
-#include <rs/recognition/CaffeProxy.h>
+#include <robosherlock/recognition/CaffeProxy.h>
 
 
 using namespace uima;
@@ -124,11 +124,11 @@ public:
 
     rs::Scene scene = cas.getScene();
 
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     scene.identifiables.filter(clusters);
     for(int i = 0; i < clusters.size(); ++i)
     {
-      rs::Cluster &cluster = clusters[i];
+      rs::ObjectHypothesis &cluster = clusters[i];
       if(!cluster.points.has())
       {
         continue;

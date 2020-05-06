@@ -1,11 +1,10 @@
 #include <uima/api.hpp>
 
 #include <pcl/point_types.h>
-#include <rs/types/all_types.h>
+#include <robosherlock/types/all_types.h>
 //RS
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/queryanswering/KRDefinitions.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
 #include <json_prolog/prolog.h>
 
 using namespace uima;
@@ -76,13 +75,16 @@ public:
 
       std::vector<rs::Geometry> geom;
       obj.annotations.filter(geom);
-      if(geom.empty())
+      std::vector<rs::PoseAnnotation> poses;
+      obj.annotations.filter(poses);
+      if(geom.empty() || poses.empty())
       {
         continue;
       }
       rs::Geometry &g = geom[0];
+      rs::PoseAnnotation &p = poses[0];
       tf::Stamped<tf::Pose> pose;
-      rs::conversion::from(g.world(), pose);
+      rs::conversion::from(p.world(), pose);
       std::string plQuery = buildPerceivecAtQuery(pose, name);
       outInfo(plQuery);
       json_prolog::PrologQueryProxy bdgs = pl.query(plQuery);

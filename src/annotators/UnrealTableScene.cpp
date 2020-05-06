@@ -1,7 +1,3 @@
-//RS
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-
 #include <uima/api.hpp>
 
 // Boost
@@ -10,16 +6,15 @@
 #include <boost/filesystem/path.hpp>
 
 //RS
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/io/UnrealVisionBridge.h>
-#include <rs/utils/output.h>
-#include <rs/utils/common.h>
-#include <rs/io/TFBroadcasterWrapper.hpp>
-#include <rs/DrawingAnnotator.h>
-#include <rs/queryanswering/KRDefinitions.h>
-#include <rs/io/Storage.h>
+#include <robosherlock/types/all_types.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/io/UnrealVisionBridge.h>
+#include <robosherlock/utils/output.h>
+#include <robosherlock/utils/common.h>
+#include <robosherlock/io/TFBroadcasterWrapper.hpp>
+#include <robosherlock/DrawingAnnotator.h>
+#include <robosherlock/io/Storage.h>
 
 //ROS
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -524,7 +519,7 @@ public:
                 outError("Found: " << o.first << ":" << points.size());
                 if(points.size() > 100)
                 {
-                  rs::Cluster uimaCluster = rs::create<rs::Cluster>(tcas);
+                  rs::ObjectHypothesis uimaCluster = rs::create<rs::ObjectHypothesis>(tcas);
                   rs::ReferenceClusterPoints rcp = rs::create<rs::ReferenceClusterPoints>(tcas);
                   pcl::PointIndices indices;
                   cv::Mat mask_full = cv::Mat::zeros(rgb_.rows, rgb_.cols, CV_8U);

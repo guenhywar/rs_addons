@@ -2,12 +2,12 @@
 #include <uima/api.hpp>
 
 // RS
-#include <rs/DrawingAnnotator.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/output.h>
-#include <rs/utils/time.h>
-#include <rs/utils/common.h>
-#include <rs/conversion/bson.h>
+#include <robosherlock/DrawingAnnotator.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/output.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/utils/common.h>
+#include <robosherlock/conversion/bson.h>
 
 // PCL
 #include <pcl/pcl_config.h>
@@ -26,9 +26,6 @@
 #include <pcl/surface/mls.h>
 
 #endif
-
-#include <rs/queryanswering/KRDefinitions.h>
-#include <rs/queryanswering/JsonPrologInterface.h>
 
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>
@@ -250,7 +247,7 @@ private:
 
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     std::vector<rs::Plane> planes;
     clustersWithParts.clear();
 
@@ -287,7 +284,7 @@ private:
 
     std::vector<rs::Identifiable> mergedClusters;
     for(int i = 0; i < clusters.size(); ++i) {
-      rs::Cluster &cluster = clusters[i];
+      rs::ObjectHypothesis &cluster = clusters[i];
 
       ClusterWithParts clusterAsParts;
 
@@ -313,7 +310,7 @@ private:
           }
         }
         for(int pclClIdx = 0; pclClIdx < clusterAsParts.partsOfClusters.size(); pclClIdx++) {
-          rs::Cluster newCluster = rs::create<rs::Cluster>(tcas);
+          rs::ObjectHypothesis newCluster = rs::create<rs::ObjectHypothesis>(tcas);
           rs::ReferenceClusterPoints rcp = rs::create<rs::ReferenceClusterPoints>(tcas);
           rs::PointIndices uimaIndices = rs::conversion::to(tcas, *clusterAsParts.partsOfClusters[pclClIdx]);
           rcp.indices.set(uimaIndices);

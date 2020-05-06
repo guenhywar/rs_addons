@@ -175,7 +175,7 @@ void RSSVM::classifyOnLiveData(std::string trained_file_name_saved, cv::Mat test
   std::cout << "predicted class is :" << res << std::endl;
 }
 
-void RSSVM::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::Cluster &cluster, std::string set_mode, double &confi)
+void RSSVM::annotate_hypotheses(uima::CAS &tcas, std::string class_name, std::string feature_name, rs::ObjectHypothesis &cluster, std::string set_mode, double &confi)
 {
   rs::Classification classResult = rs::create<rs::Classification>(tcas);
   classResult.classname.set(class_name);

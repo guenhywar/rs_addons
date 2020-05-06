@@ -1,7 +1,3 @@
-//RS
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-
 #include <uima/api.hpp>
 
 // Boost
@@ -9,16 +5,15 @@
 #include <boost/property_tree/ini_parser.hpp>
 
 //RS
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
-#include <rs/io/UnrealVisionBridge.h>
-#include <rs/utils/output.h>
-#include <rs/utils/common.h>
-#include <rs/io/TFBroadcasterWrapper.hpp>
-#include <rs/DrawingAnnotator.h>
-#include <rs/queryanswering/KRDefinitions.h>
-#include <rs/io/Storage.h>
+#include <robosherlock/types/all_types.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
+#include <robosherlock/io/UnrealVisionBridge.h>
+#include <robosherlock/utils/output.h>
+#include <robosherlock/utils/common.h>
+#include <robosherlock/io/TFBroadcasterWrapper.hpp>
+#include <robosherlock/DrawingAnnotator.h>
+#include <robosherlock/io/Storage.h>
 
 //ROS
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -309,12 +304,15 @@ public:
       obj.annotations.filter(detections);
       outInfo("Detections: " << detections.size());
       std::vector<rs::Geometry> geom;
+      std::vector<rs::PoseAnnotation> poses;
       obj.annotations.filter(geom);
-      if(!geom.empty())
+      obj.annotations.filter(poses);
+      if(!geom.empty() && !poses.empty())
       {
         rs::Geometry &g = geom[0];
+	rs::PoseAnnotation &p = poses[0];
         tf::Stamped<tf::Pose> pose;
-        rs::conversion::from(g.world(), pose);
+        rs::conversion::from(p.world(), pose);
         marker.pose.position.x = pose.getOrigin().x();
         marker.pose.position.y = pose.getOrigin().y();
         marker.pose.position.z = pose.getOrigin().z();
@@ -480,7 +478,7 @@ public:
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
 
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     scene.identifiables.filter(clusters);
     outInfo("Found " << clusters.size() << " object hypotheses");
 
@@ -610,7 +608,7 @@ public:
             outError("Found: " << o.first << ":" << points.size());
             if(points.size() > 0)
             {
-              rs::Cluster uimaCluster = rs::create<rs::Cluster>(tcas);
+              rs::ObjectHypothesis uimaCluster = rs::create<rs::ObjectHypothesis>(tcas);
               rs::ReferenceClusterPoints rcp = rs::create<rs::ReferenceClusterPoints>(tcas);
               pcl::PointIndices indices;
               cv::Mat mask_full = cv::Mat::zeros(rgb_.rows, rgb_.cols, CV_8U);

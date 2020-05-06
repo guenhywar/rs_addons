@@ -3,9 +3,9 @@
 #include <uima/api.hpp>
 #include <iostream>
 #include <pcl/point_types.h>
-#include <rs/types/all_types.h>
-#include <rs/scene_cas.h>
-#include <rs/utils/time.h>
+#include <robosherlock/types/all_types.h>
+#include <robosherlock/scene_cas.h>
+#include <robosherlock/utils/time.h>
 
 #if CV_MAJOR_VERSION == 2
 #include <opencv2/highgui/highgui.hpp>
@@ -22,7 +22,7 @@
 #include<ros/package.h>
 #include<boost/filesystem.hpp>
 #include <rs_addons/classifiers/RSRF.h>
-#include <rs/DrawingAnnotator.h>
+#include <robosherlock/DrawingAnnotator.h>
 
 using namespace uima;
 
@@ -98,7 +98,7 @@ public:
     rs::SceneCas cas(tcas);
     rs::Scene scene = cas.getScene();
     cas.get(VIEW_COLOR_IMAGE_HD, color);
-    std::vector<rs::Cluster> clusters;
+    std::vector<rs::ObjectHypothesis> clusters;
     scene.identifiables.filter(clusters);
 
 
